@@ -1,0 +1,99 @@
+import { Type } from "typebox";
+import { createTool } from "./_factory.js";
+import { isNonSourceFile } from "../core/filter.js";
+import { getNextForTool, formatNextSection } from "../core/output.js";
+export function registerHotspots(pi) {
+    createTool(pi, {
+        name: "shazam_hotspots",
+        label: "Complexity Hotspots",
+        description: `\
+		Without this, you optimize the wrong files. Returns files ranked by
+		(symbol density x PageRank) — these are the files where bugs have the
+		highest blast radius. Use to prioritize code review, decide where to
+		write tests first, and understand which files form the project's
+		core.`,
+        params: Type.Object({ topN: Type.Optional(Type.Number()) }),
+        execute(graph, params) {
+            const json = params.json ?? false;
+            const topN = params.topN ?? 10;
+            return json ? executeHotspotsJson(graph, topN) : executeHotspots(graph, topN);
+        },
+    });
+}
+export function executeHotspots(graph, topN = 10) {
+    const hotspots = computeHotspots(graph, topN);
+    const lines = [];
+    lines.push(`## Complexity Hotspots (Top ${topN})`);
+    lines.push("");
+    lines.push("Ranked by symbol density × PageRank score.");
+    lines.push("");
+    lines.push("Config and generated files (package-lock.json, package.json, tsconfig.json, dist/, node_modules/) are excluded.");
+    lines.push("");
+    for (let i = 0; i < hotspots.length; i++) {
+        const h = hotspots[i];
+        lines.push(`${i + 1}. \`${h.file}\` — score: ${h.hotspotScore.toFixed(2)}`);
+        lines.push(`   ${h.symbolCount} symbols | PageRank: ${h.totalPagerank.toFixed(2)} | in:${h.incomingRefs} out:${h.outgoingRefs}`);
+        lines.push("");
+    }
+    // Add Next recommendations
+    const nextItems = getNextForTool("hotspots", { topFile: hotspots[0]?.file });
+    if (nextItems.length > 0) {
+        lines.push("");
+        lines.push(formatNextSection(nextItems));
+    }
+    return lines.join("\n");
+}
+export function executeHotspotsJson(graph, topN) {
+    const hotspots = computeHotspots(graph, topN);
+    return JSON.stringify({
+        schema_version: "1.0",
+        command: "hotspots",
+        status: "ok",
+        result: {
+            hotspots: hotspots.map((h) => ({
+                file: h.file,
+                symbolCount: h.symbolCount,
+                totalPagerank: Number(h.totalPagerank.toFixed(4)),
+                incomingRefs: h.incomingRefs,
+                outgoingRefs: h.outgoingRefs,
+                hotspotScore: Number(h.hotspotScore.toFixed(2)),
+            })),
+        },
+    });
+}
+// ── Note: `isNonSourceFile` is defined in core/filter.ts — imported above
+// ── Core compute ────────────────────────────────────────────────────────────────
+function computeHotspots(graph, topN) {
+    const fileStats = new Map();
+    for (const [file, symIds] of graph.fileSymbols) {
+        if (isNonSourceFile(file))
+            continue;
+        let totalPR = 0;
+        let incoming = 0;
+        let outgoing = 0;
+        for (const id of symIds) {
+            const sym = graph.symbols.get(id);
+            if (sym) {
+                totalPR += sym.pagerank;
+            }
+            const inc = graph.incoming.get(id);
+            if (inc)
+                incoming += inc.length;
+            const out = graph.outgoing.get(id);
+            if (out)
+                outgoing += out.length;
+        }
+        // Hotspot score = symbolCount * totalPagerank (normalized)
+        const hotspotScore = symIds.length * totalPR;
+        fileStats.set(file, {
+            file,
+            symbolCount: symIds.length,
+            totalPagerank: totalPR,
+            incomingRefs: incoming,
+            outgoingRefs: outgoing,
+            hotspotScore,
+        });
+    }
+    return [...fileStats.values()].sort((a, b) => b.hotspotScore - a.hotspotScore).slice(0, topN);
+}
+//# sourceMappingURL=hotspots.js.map
