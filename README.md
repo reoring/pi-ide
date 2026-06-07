@@ -6,6 +6,7 @@ This package is a maintained local fork of `pi-shazam@0.3.2`, derived from the M
 
 - startup overview scanning is disabled by default
 - post-edit auto-verify scanning is disabled by default
+- startup LSP auto-initialization is disabled by default
 - large generated/reference directories are skipped by default
 - extra skip directories can be configured with env vars or `.pi-ide.json`
 
@@ -22,6 +23,7 @@ Automatic scans are off unless explicitly enabled:
 ```bash
 PI_IDE_AUTO_OVERVIEW=1 pi
 PI_IDE_AUTO_VERIFY=1 pi
+PI_IDE_AUTO_LSP=1 pi
 ```
 
 Additional skip directories can be configured with an environment variable:

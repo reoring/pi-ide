@@ -32,6 +32,10 @@ import { registerFindTests } from "./tools/find_tests.js";
 import { registerTypeHierarchy } from "./tools/type_hierarchy.js";
 import { registerRenameSymbol } from "./tools/rename_symbol.js";
 import { registerSafeDelete } from "./tools/safe_delete.js";
+function isAutoLspEnabled() {
+    const value = process.env.PI_IDE_AUTO_LSP ?? process.env.PI_SHAZAM_AUTO_LSP;
+    return value === "1" || value?.toLowerCase() === "true" || value?.toLowerCase() === "yes";
+}
 export default function (pi) {
     const projectRoot = process.cwd();
     const log = (msg) => {
@@ -44,6 +48,10 @@ export default function (pi) {
     setLspManager(lspManager);
     // Auto-initialize LSP on agent start
     pi.on("before_agent_start", async (_event, _ctx) => {
+        if (!isAutoLspEnabled()) {
+            log("before_agent_start LSP auto-init disabled. Set PI_IDE_AUTO_LSP=1 to enable it.");
+            return;
+        }
         try {
             const languages = lspManager.detectLanguages();
             if (languages.length > 0) {

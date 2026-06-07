@@ -364,6 +364,7 @@ export function buildRecentChangesSection(projectRoot) {
             cwd: projectRoot,
             timeout: 5000,
             encoding: "utf-8",
+            stdio: ["ignore", "pipe", "ignore"],
         }).trim();
         if (!stdout)
             return null;
