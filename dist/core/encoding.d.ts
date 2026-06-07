@@ -1,5 +1,5 @@
 /**
- * pi-shazam core/encoding — Adaptive file encoding reader.
+ * pi-ide core/encoding — Adaptive file encoding reader.
  *
  * Reads files with UTF-8 → GBK → GB2312 fallback.
  * Ported from repomap's encoding detection pattern.

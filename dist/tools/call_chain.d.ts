@@ -1,5 +1,5 @@
 /**
- * pi-shazam tools/call_chain — Call graph traversal.
+ * code tools/call_chain — Call graph traversal.
  */
 import type { ExtensionAPI } from "../types/pi-extension.js";
 import type { RepoGraph } from "../core/graph.js";

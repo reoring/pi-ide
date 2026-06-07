@@ -1,5 +1,5 @@
 /**
- * pi-shazam core/cache — Graph baseline save/diff for incremental analysis.
+ * pi-ide core/cache — Graph baseline save/diff for incremental analysis.
  *
  * Ported from repomap/src/__init__.py (get_project_cache_dir, compare_graph_snapshots,
  * IncrementalCache).

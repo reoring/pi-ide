@@ -1,5 +1,5 @@
 /**
- * pi-shazam tools/file_detail — Single file deep analysis.
+ * code tools/file_detail — Single file deep analysis.
  *
  * When LSP is available, augments tree-sitter symbol list with a
  * parent-child hierarchy section from documentSymbol. Falls back to

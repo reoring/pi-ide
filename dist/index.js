@@ -16,7 +16,7 @@ import { installPreCommitHook, removePreCommitHook, runPreCommitVerify } from ".
 import { registerBeforeStartHook } from "./hooks/before-start.js";
 import { registerAfterWriteHook } from "./hooks/after-write.js";
 import { registerToolLogger } from "./hooks/tool-logger.js";
-import { registerShazamGuide } from "./hooks/shazam-guide.js";
+import { registerCodeGuide } from "./hooks/code-guide.js";
 // ── Tool registrations ────────────────────────────────────────────────────
 import { registerOverview } from "./tools/overview.js";
 import { registerImpact } from "./tools/impact.js";
@@ -33,7 +33,7 @@ import { registerTypeHierarchy } from "./tools/type_hierarchy.js";
 import { registerRenameSymbol } from "./tools/rename_symbol.js";
 import { registerSafeDelete } from "./tools/safe_delete.js";
 function isAutoLspEnabled() {
-    const value = process.env.PI_IDE_AUTO_LSP ?? process.env.PI_SHAZAM_AUTO_LSP;
+    const value = process.env.PI_IDE_AUTO_LSP;
     return value === "1" || value?.toLowerCase() === "true" || value?.toLowerCase() === "yes";
 }
 export default function (pi) {
@@ -72,38 +72,38 @@ export default function (pi) {
     registerBeforeStartHook(pi);
     registerAfterWriteHook(pi);
     registerToolLogger(pi);
-    registerShazamGuide(pi);
-    // ── /shazam-setup command ───────────────────────────────────────────────
-    pi.registerCommand("shazam-setup", {
+    registerCodeGuide(pi);
+    // ── /code-setup command ───────────────────────────────────────────────
+    pi.registerCommand("code-setup", {
         description: "Detect and report LSP server availability with install instructions",
         async handler(_args, ctx) {
             const report = generateSetupReport(projectRoot);
-            ctx.ui?.setStatus?.("shazam-setup", "LSP setup report generated");
+            ctx.ui?.setStatus?.("code-setup", "LSP setup report generated");
             // Send as a custom message so the user sees the report
             pi.sendMessage({
-                customType: "shazam-setup",
+                customType: "code-setup",
                 content: report,
                 display: true,
             });
         },
     });
-    // ── /shazam-doctor command ──────────────────────────────────────────────
-    pi.registerCommand("shazam-doctor", {
+    // ── /code-doctor command ──────────────────────────────────────────────
+    pi.registerCommand("code-doctor", {
         description: "Health check: tree-sitter grammars, LSP servers, cache integrity",
         async handler(_args, ctx) {
             const lspReport = generateSetupReport(projectRoot);
-            const msg = ["## Shazam Doctor — Health Check", "", lspReport].join("\n");
-            ctx.ui?.setStatus?.("shazam-doctor", "Health check complete");
+            const msg = ["## Pi IDE Doctor — Health Check", "", lspReport].join("\n");
+            ctx.ui?.setStatus?.("code-doctor", "Health check complete");
             pi.sendMessage({
-                customType: "shazam-doctor",
+                customType: "code-doctor",
                 content: msg,
                 display: true,
             });
         },
     });
-    // ── /shazam-install-git-hooks command ────────────────────────────────────
-    pi.registerCommand("shazam-install-git-hooks", {
-        description: "Install git pre-commit hook that runs shazam_verify --preCommit",
+    // ── /code-install-git-hooks command ────────────────────────────────────
+    pi.registerCommand("code-install-git-hooks", {
+        description: "Install git pre-commit hook that runs code_verify --preCommit",
         async handler(_args, ctx) {
             try {
                 const hookPath = installPreCommitHook(projectRoot);
@@ -112,49 +112,49 @@ export default function (pi) {
                     "",
                     `Hook installed at: \`${hookPath}\``,
                     "",
-                    "This hook runs shazam verification before every commit.",
+                    "This hook runs code verification before every commit.",
                     "To bypass: \`git commit --no-verify\`",
-                    "To uninstall: \`/shazam-remove-git-hooks\`",
+                    "To uninstall: \`/code-remove-git-hooks\`",
                 ].join("\n");
-                ctx.ui?.setStatus?.("shazam-install-git-hooks", "Git pre-commit hook installed");
-                pi.sendMessage({ customType: "shazam-install-git-hooks", content: msg, display: true });
+                ctx.ui?.setStatus?.("code-install-git-hooks", "Git pre-commit hook installed");
+                pi.sendMessage({ customType: "code-install-git-hooks", content: msg, display: true });
             }
             catch (err) {
                 const errMsg = err instanceof Error ? err.message : String(err);
                 pi.sendMessage({
-                    customType: "shazam-install-git-hooks",
+                    customType: "code-install-git-hooks",
                     content: `Failed to install git hook: ${errMsg}`,
                     display: true,
                 });
             }
         },
     });
-    // ── /shazam-remove-git-hooks command ─────────────────────────────────────
-    pi.registerCommand("shazam-remove-git-hooks", {
-        description: "Remove the shazam git pre-commit hook",
+    // ── /code-remove-git-hooks command ─────────────────────────────────────
+    pi.registerCommand("code-remove-git-hooks", {
+        description: "Remove the code git pre-commit hook",
         async handler(_args, ctx) {
             const removed = removePreCommitHook(projectRoot);
             if (removed) {
                 const msg = [
                     "## Git Pre-Commit Hook Removed",
                     "",
-                    "The shazam pre-commit hook has been removed.",
+                    "The code pre-commit hook has been removed.",
                     "Your original hook (if any) has been restored.",
                 ].join("\n");
-                ctx.ui?.setStatus?.("shazam-remove-git-hooks", "Git pre-commit hook removed");
-                pi.sendMessage({ customType: "shazam-remove-git-hooks", content: msg, display: true });
+                ctx.ui?.setStatus?.("code-remove-git-hooks", "Git pre-commit hook removed");
+                pi.sendMessage({ customType: "code-remove-git-hooks", content: msg, display: true });
             }
             else {
                 pi.sendMessage({
-                    customType: "shazam-remove-git-hooks",
-                    content: "No shazam pre-commit hook found to remove.",
+                    customType: "code-remove-git-hooks",
+                    content: "No code pre-commit hook found to remove.",
                     display: true,
                 });
             }
         },
     });
-    // ── /shazam-pre-commit-verify command (for hook script) ──────────────────
-    pi.registerCommand("shazam-pre-commit-verify", {
+    // ── /code-pre-commit-verify command (for hook script) ──────────────────
+    pi.registerCommand("code-pre-commit-verify", {
         description: "Run pre-commit verification (used by git hook)",
         async handler(_args, ctx) {
             const result = runPreCommitVerify(projectRoot);
@@ -164,8 +164,8 @@ export default function (pi) {
                 `Verdict: ${result.verdict}`,
                 `${result.message}`,
             ].join("\n");
-            ctx.ui?.setStatus?.("shazam-pre-commit-verify", `Pre-commit verify: ${result.verdict}`);
-            pi.sendMessage({ customType: "shazam-pre-commit-verify", content: msg, display: true });
+            ctx.ui?.setStatus?.("code-pre-commit-verify", `Pre-commit verify: ${result.verdict}`);
+            pi.sendMessage({ customType: "code-pre-commit-verify", content: msg, display: true });
         },
     });
     // ── Tools (LLM-visible) ────────────────────────────────────────────────

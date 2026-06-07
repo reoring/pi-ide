@@ -1,5 +1,5 @@
 /**
- * pi-shazam — Pi coding agent native codebase awareness extension.
+ * pi-ide — Pi coding agent native codebase awareness extension.
  *
  * Entry point. Registered as a default export.
  *

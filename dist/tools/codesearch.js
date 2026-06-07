@@ -1,5 +1,5 @@
 /**
- * pi-shazam tools/codesearch — BM25 symbol search with optional LSP enrichment.
+ * code tools/codesearch — BM25 symbol search with optional LSP enrichment.
  *
  * When LSP servers are running and advertise workspaceSymbolProvider,
  * workspace/symbol results are merged with BM25 scores. LSP hits get
@@ -20,7 +20,7 @@ import { createTool } from "./_factory.js";
 const LSP_BOOST = 50;
 export function registerCodesearch(pi) {
     createTool(pi, {
-        name: "shazam_codesearch",
+        name: "code_search",
         label: "Code Search (BM25)",
         description: `\
 		Don't reach for grep or raw text search across the codebase. Use this

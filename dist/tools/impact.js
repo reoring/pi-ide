@@ -3,7 +3,7 @@ import { getNextForTool, formatNextSection } from "../core/output.js";
 import { createTool } from "./_factory.js";
 export function registerImpact(pi) {
     createTool(pi, {
-        name: "shazam_impact",
+        name: "code_impact",
         label: "Change Impact Analysis",
         description: `\
 		Required before editing 2+ files or any shared/exported module.

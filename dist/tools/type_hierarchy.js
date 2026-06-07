@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 export function registerTypeHierarchy(pi) {
     createTool(pi, {
-        name: "shazam_type_hierarchy",
+        name: "code_type_hierarchy",
         label: "Type Hierarchy",
         description: `\
 		When working with classes, interfaces, or abstract types — use this

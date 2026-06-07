@@ -1,5 +1,5 @@
 /**
- * pi-shazam tools/hover — Symbol type/documentation hover.
+ * code tools/hover — Symbol type/documentation hover.
  *
  * Uses LSP textDocument/hover to get type information and documentation
  * for a symbol at a given position. Falls back to graph metadata when

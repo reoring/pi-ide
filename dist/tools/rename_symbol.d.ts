@@ -1,5 +1,5 @@
 /**
- * pi-shazam tools/rename_symbol — LSP cross-file symbol rename.
+ * code tools/rename_symbol — LSP cross-file symbol rename.
  *
  * Uses LSP textDocument/rename to perform a cross-file rename.
  * Requires prior call_chain verification for safety.

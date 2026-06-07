@@ -6,7 +6,7 @@ import { lspDocumentSymbols } from "./lsp_enrich.js";
 import { createTool } from "./_factory.js";
 export function registerFileDetail(pi) {
     createTool(pi, {
-        name: "shazam_file_detail",
+        name: "code_file_detail",
         label: "File Deep Analysis",
         description: `\
 		When you are about to edit a file you have not read before — this

@@ -3,7 +3,7 @@ import { getNextForTool, formatNextSection } from "../core/output.js";
 import { createTool } from "./_factory.js";
 export function registerCallChain(pi) {
     createTool(pi, {
-        name: "shazam_call_chain",
+        name: "code_call_chain",
         label: "Call Chain Analysis",
         description: `\
 		Without this, you ship bugs. Every caller you miss when changing a

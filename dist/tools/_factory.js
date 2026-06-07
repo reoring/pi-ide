@@ -48,7 +48,7 @@ export function createTool(pi, spec) {
                 catch {
                     text = JSON.stringify({
                         schema_version: "1.0",
-                        command: spec.name.replace("shazam_", ""),
+                        command: spec.name.replace("code_", ""),
                         status: "ok",
                         result: text,
                     }, null, 2);

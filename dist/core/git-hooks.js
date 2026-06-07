@@ -1,11 +1,11 @@
 /**
- * pi-shazam core/git-hooks — Git pre-commit hook integration.
+ * pi-ide core/git-hooks — Git pre-commit hook integration.
  *
- * Installs a pre-commit hook that runs shazam_verify --preCommit
+ * Installs a pre-commit hook that runs code_verify --preCommit
  * before allowing a commit. Blocks commit on FAIL verdict.
  *
  * The hook is installed as .git/hooks/pre-commit in the project root.
- * It calls npx shazam_verify (via the Pi extension's verify tool)
+ * It calls npx code_verify (via the Pi extension's verify tool)
  * through the MCP entry point.
  */
 import { writeFileSync, chmodSync, existsSync, readFileSync } from "node:fs";
@@ -13,16 +13,16 @@ import { join, resolve } from "node:path";
 import { execSync } from "node:child_process";
 /**
  * Pre-commit hook script content.
- * Runs shazam_verify --preCommit and exits with 1 on failure.
+ * Runs code_verify --preCommit and exits with 1 on failure.
  */
 const PRE_COMMIT_HOOK_CONTENT = `#!/bin/bash
-# shazam pre-commit hook — auto-installed by pi-shazam
-# Runs shazam_verify --preCommit before allowing a commit.
+# pi-ide pre-commit hook — auto-installed by pi-ide
+# Runs code_verify --preCommit before allowing a commit.
 # Use 'git commit --no-verify' to bypass.
 
-echo "[shazam] Running pre-commit verification..."
+echo "[ide] Running pre-commit verification..."
 
-# Try to run via npx pi-shazam-mcp with a simple verify script
+# Try to run via npx pi-ide-mcp with a simple verify script
 # Fallback path: try node directly
 HOOK_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 
@@ -33,43 +33,43 @@ if command -v npx &>/dev/null; then
   # Run git diff checks directly
   CHANGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR 2>/dev/null | wc -l)
   if [ "$CHANGED_FILES" -eq 0 ]; then
-    echo "[shazam] No staged changes to verify."
+    echo "[ide] No staged changes to verify."
     exit 0
   fi
 
-  echo "[shazam] Checking $CHANGED_FILES changed file(s)..."
+  echo "[ide] Checking $CHANGED_FILES changed file(s)..."
 
   # Run typecheck if available
   if [ -f "package.json" ] && grep -q '"typecheck"' package.json 2>/dev/null; then
-    echo "[shazam] Running typecheck..."
+    echo "[ide] Running typecheck..."
     npm run typecheck 2>/dev/null
     TSC_EXIT=$?
     if [ $TSC_EXIT -ne 0 ]; then
-      echo "[shazam] FAIL: TypeScript typecheck found errors."
-      echo "[shazam] Fix errors or use 'git commit --no-verify' to bypass."
+      echo "[ide] FAIL: TypeScript typecheck found errors."
+      echo "[ide] Fix errors or use 'git commit --no-verify' to bypass."
       exit 1
     fi
   fi
 
   # Run tests for changed files if test script exists
   if [ -f "package.json" ] && grep -q '"test"' package.json 2>/dev/null; then
-    echo "[shazam] Running tests for changed files..."
+    echo "[ide] Running tests for changed files..."
     # For now, just run a quick test on changed areas
     # Full test suite is too slow for pre-commit
   fi
 
-  echo "[shazam] PASS: Pre-commit checks passed."
+  echo "[ide] PASS: Pre-commit checks passed."
   exit 0
 else
-  echo "[shazam] WARN: npx not found, skipping pre-commit verification."
-  echo "[shazam] Install Node.js to enable pre-commit verification."
+  echo "[ide] WARN: npx not found, skipping pre-commit verification."
+  echo "[ide] Install Node.js to enable pre-commit verification."
   exit 0
 fi
 `;
 /**
  * Install the pre-commit git hook for the given project.
  *
- * Writes .git/hooks/pre-commit with the shazam verify script
+ * Writes .git/hooks/pre-commit with the ide verify script
  * and makes it executable.
  *
  * @param projectRoot - Absolute path to the project root
@@ -86,9 +86,9 @@ export function installPreCommitHook(projectRoot) {
     // Check if hook already exists (don't overwrite custom hooks)
     if (existsSync(hookPath)) {
         const existingContent = readFileSync(hookPath, "utf-8");
-        if (!existingContent.includes("shazam")) {
+        if (!existingContent.includes("ide")) {
             // Backup existing hook
-            const backupPath = join(hooksDir, "pre-commit.shazam-backup");
+            const backupPath = join(hooksDir, "pre-commit.pi-ide-backup");
             writeFileSync(backupPath, existingContent, "utf-8");
         }
     }
@@ -100,14 +100,14 @@ export function installPreCommitHook(projectRoot) {
  * Check if the pre-commit hook is installed for the given project.
  *
  * @param projectRoot - Absolute path to the project root
- * @returns True if the shazam pre-commit hook is installed
+ * @returns True if the pi-ide pre-commit hook is installed
  */
 export function isPreCommitHookInstalled(projectRoot) {
     const hookPath = join(resolve(projectRoot, ".git"), "hooks", "pre-commit");
     if (!existsSync(hookPath))
         return false;
     const content = readFileSync(hookPath, "utf-8");
-    return content.includes("shazam");
+    return content.includes("ide");
 }
 /**
  * Remove the installed pre-commit hook, restoring any backup if present.
@@ -119,11 +119,11 @@ export function removePreCommitHook(projectRoot) {
     const gitDir = resolve(projectRoot, ".git");
     const hooksDir = join(gitDir, "hooks");
     const hookPath = join(hooksDir, "pre-commit");
-    const backupPath = join(hooksDir, "pre-commit.shazam-backup");
+    const backupPath = join(hooksDir, "pre-commit.pi-ide-backup");
     if (!existsSync(hookPath))
         return false;
     const content = readFileSync(hookPath, "utf-8");
-    if (!content.includes("shazam"))
+    if (!content.includes("ide"))
         return false;
     // Restore backup if exists
     if (existsSync(backupPath)) {
@@ -132,7 +132,7 @@ export function removePreCommitHook(projectRoot) {
         chmodSync(hookPath, 0o755);
     }
     else {
-        // Remove the shazam-installed hook
+        // Remove the pi-ide-installed hook
         writeFileSync(hookPath, "", "utf-8");
     }
     return true;

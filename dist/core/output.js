@@ -1,5 +1,5 @@
 /**
- * pi-shazam core/output — Standardized tool output formatting.
+ * pi-ide core/output — Standardized tool output formatting.
  *
  * All tool outputs follow a three-section skeleton:
  *   1. ## Result Summary (key-value table / quick summary)
@@ -351,7 +351,8 @@ function buildToolCommand(item) {
             .map(([k, v]) => `--${k} ${v}`)
             .join(" ")
         : "";
-    return `shazam_${item.tool} ${params}`.trim();
+    const publicToolName = item.tool === "codesearch" ? "search" : item.tool;
+    return `code_${publicToolName} ${params}`.trim();
 }
 /**
  * Get standardized Next recommendations for a given tool and context.

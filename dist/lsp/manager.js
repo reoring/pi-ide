@@ -1,5 +1,5 @@
 /**
- * pi-shazam lsp/manager — Language server process lifecycle management.
+ * pi-ide lsp/manager — Language server process lifecycle management.
  *
  * Detects project languages, spawns LSP servers on demand,
  * handles health checks, restarts, and graceful shutdown.

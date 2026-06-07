@@ -9,7 +9,7 @@ import { getLspManager } from "./_context.js";
 import { createTool } from "./_factory.js";
 export function registerVerify(pi) {
     createTool(pi, {
-        name: "shazam_verify",
+        name: "code_verify",
         label: "Verify Changes",
         description: `\
 		After every write or edit, run this to confirm no errors were
@@ -563,7 +563,7 @@ export function executeCheck(graph, _projectRoot, file) {
     lines.push(`Symbols: ${totalSymbols}`);
     lines.push(`Edges: ${totalEdges}`);
     lines.push("");
-    lines.push(`For LSP diagnostics, use \`shazam_verify\` (default mode includes LSP).`);
+    lines.push(`For LSP diagnostics, use \`code_verify\` (default mode includes LSP).`);
     return lines.join("\n");
 }
 export function executeCheckJson(graph, _projectRoot, file) {
@@ -634,11 +634,11 @@ export function executeReady(graph, projectRoot) {
         lines.push("### Issues to Fix Before Commit");
         lines.push("");
         if (riskLevel !== "low")
-            lines.push(`- Risk level is **${riskLevel}** — run \`shazam_verify\` for details`);
+            lines.push(`- Risk level is **${riskLevel}** — run \`code_verify\` for details`);
         if (orphanCount > 0)
-            lines.push(`- ${orphanCount} orphan symbol(s) — run \`shazam_verify\` for detailed review`);
+            lines.push(`- ${orphanCount} orphan symbol(s) — run \`code_verify\` for detailed review`);
         if (failedFiles > 0)
-            lines.push(`- ${failedFiles} file(s) failed parse — run \`shazam_verify\` for details`);
+            lines.push(`- ${failedFiles} file(s) failed parse — run \`code_verify\` for details`);
         lines.push("");
     }
     else {

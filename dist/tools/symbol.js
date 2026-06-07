@@ -8,7 +8,7 @@ import { createTool } from "./_factory.js";
 const STATE_MAP_KINDS = new Set(["enum", "class", "interface", "type_alias", "const"]);
 export function registerSymbol(pi) {
     createTool(pi, {
-        name: "shazam_symbol",
+        name: "code_symbol",
         label: "Symbol Lookup",
         description: `\
 		When you need to look up a symbol before importing or calling it —
@@ -235,7 +235,7 @@ export function executeStateMap(graph, symbolName) {
             lines.push(`Symbol \`${target.name}\` is a ${target.kind}, not an enum, const group, or state machine.`);
             lines.push("State map analysis requires: enum, class (constants/state machine), interface, type_alias (union type), or const.");
             lines.push("");
-            lines.push(`Use \`shazam_symbol --name ${target.name}\` or \`shazam_call_chain --symbol ${target.name} --flat\` instead.`);
+            lines.push(`Use \`code_symbol --name ${target.name}\` or \`code_call_chain --symbol ${target.name} --flat\` instead.`);
             continue;
         }
         lines.push(`## State Map: ${target.kind} \`${target.name}\` (${target.file}:${target.line})`);

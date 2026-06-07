@@ -46,30 +46,30 @@ function hasMultiFileEdit(content) {
     }
     return false;
 }
-export function registerShazamGuide(pi) {
+export function registerCodeGuide(pi) {
     pi.on("before_agent_start", (_event, _ctx) => {
         const sp = Array.isArray(_event.systemPrompt) ? _event.systemPrompt.join("\n") : String(_event.systemPrompt ?? "");
-        if (sp.includes("pi-shazam tools available"))
+        if (sp.includes("code tools available"))
             return;
         return {
             systemPrompt: [
                 sp,
                 "",
-                "14 pi-shazam tools available this session:",
-                "  shazam_overview — project structure, deps, git history in one call",
-                "  shazam_impact   — check blast radius before editing multiple files",
-                "  shazam_codesearch — ranked code search, more precise than grep",
-                "  shazam_symbol   — locate a function/class definition and its callers",
-                "  shazam_hover     — type signatures and JSDoc via LSP",
-                "  shazam_file_detail — see all symbols and dependencies in a file",
-                "  shazam_call_chain — trace every caller before changing a function",
-                "  shazam_find_tests — discover test files for any module",
-                "  shazam_hotspots  — find the most complex, highest-risk files",
-                "  shazam_type_hierarchy — full class inheritance chain",
-                "  shazam_verify    — check for errors after every edit (PASS/WARN/FAIL)",
-                "  shazam_fix       — auto-fix format and lint issues",
-                "  shazam_rename_symbol  — safe rename, verify references first",
-                "  shazam_safe_delete    — confirm zero references before removing",
+                "14 code tools available this session:",
+                "  code_overview — project structure, deps, git history in one call",
+                "  code_impact   — check blast radius before editing multiple files",
+                "  code_search — ranked code search, more precise than grep",
+                "  code_symbol   — locate a function/class definition and its callers",
+                "  code_hover     — type signatures and JSDoc via LSP",
+                "  code_file_detail — see all symbols and dependencies in a file",
+                "  code_call_chain — trace every caller before changing a function",
+                "  code_find_tests — discover test files for any module",
+                "  code_hotspots  — find the most complex, highest-risk files",
+                "  code_type_hierarchy — full class inheritance chain",
+                "  code_verify    — check for errors after every edit (PASS/WARN/FAIL)",
+                "  code_fix       — auto-fix format and lint issues",
+                "  code_rename_symbol  — safe rename, verify references first",
+                "  code_safe_delete    — confirm zero references before removing",
             ].join("\n"),
         };
     });
@@ -78,23 +78,23 @@ export function registerShazamGuide(pi) {
         if (event.toolName === "write" || event.toolName === "edit") {
             if (event.isError)
                 return;
-            ctx.ui?.notify?.("reminder: shazam_verify checks for errors after editing", "info");
+            ctx.ui?.notify?.("reminder: code_verify checks for errors after editing", "info");
             // Check if multi-file edit was done — suggest impact analysis
             if (hasMultiFileEdit(event.content)) {
-                ctx.ui?.notify?.("suggestion: you edited multiple files — shazam_impact assesses blast radius before continuing", "info");
+                ctx.ui?.notify?.("suggestion: you edited multiple files — code_impact assesses blast radius before continuing", "info");
             }
             return;
         }
-        // After shazam_symbol: suggest call_chain for symbols with many callers
-        if (event.toolName === "shazam_symbol") {
+        // After code_symbol: suggest call_chain for symbols with many callers
+        if (event.toolName === "code_symbol") {
             const symbolName = hasManyCallers(event.content);
             if (symbolName && !event.isError) {
-                ctx.ui?.notify?.(`recommended: shazam_call_chain --symbol ${symbolName} traces all callers before changing this symbol`, "info");
+                ctx.ui?.notify?.(`recommended: code_call_chain --symbol ${symbolName} traces all callers before changing this symbol`, "info");
             }
             return;
         }
-        // After shazam_verify FAIL/WARN: suggest remediation
-        if (event.toolName === "shazam_verify" && !event.isError) {
+        // After code_verify FAIL/WARN: suggest remediation
+        if (event.toolName === "code_verify" && !event.isError) {
             const texts = [];
             if (event.content) {
                 for (const c of event.content) {
@@ -104,18 +104,18 @@ export function registerShazamGuide(pi) {
             }
             const combined = texts.join("\n");
             if (combined.includes("[FAIL]")) {
-                ctx.ui?.notify?.("shazam_verify reported FAIL — fix errors before proceeding", "warning");
+                ctx.ui?.notify?.("code_verify reported FAIL — fix errors before proceeding", "warning");
             }
             else if (combined.includes("[WARN]")) {
-                ctx.ui?.notify?.("shazam_verify reported WARN — review warnings, then run shazam_fix if needed", "info");
+                ctx.ui?.notify?.("code_verify reported WARN — review warnings, then run code_fix if needed", "info");
             }
             else if (combined.includes("[PASS]")) {
-                ctx.ui?.notify?.("shazam_verify passed — changes look good", "info");
+                ctx.ui?.notify?.("code_verify passed — changes look good", "info");
             }
             return;
         }
-        // After shazam_file_detail: suggest find_tests if file might have tests
-        if (event.toolName === "shazam_file_detail" && !event.isError) {
+        // After code_file_detail: suggest find_tests if file might have tests
+        if (event.toolName === "code_file_detail" && !event.isError) {
             const texts = [];
             if (event.content) {
                 for (const c of event.content) {
@@ -128,7 +128,7 @@ export function registerShazamGuide(pi) {
             const fileMatch = combined.match(/^## (.+?)(?:\s|$)/m) || combined.match(/File: `([^`]+)`/);
             if (fileMatch) {
                 const fileName = fileMatch[1] || fileMatch[0];
-                ctx.ui?.notify?.(`suggestion: shazam_find_tests --sourceFile ${fileName} finds tests for this file`, "info");
+                ctx.ui?.notify?.(`suggestion: code_find_tests --sourceFile ${fileName} finds tests for this file`, "info");
             }
         }
     });
@@ -136,19 +136,19 @@ export function registerShazamGuide(pi) {
         const name = event.toolName;
         // Suggest codesearch over grep/search/find
         if (name === "search" || name === "grep" || name === "find") {
-            ctx.ui?.notify?.("reminder: shazam_codesearch gives ranked results, try it instead of grep", "info");
+            ctx.ui?.notify?.("reminder: code_search gives ranked results, try it instead of grep", "info");
             return;
         }
         // Before impact: suggest verifying first if there are uncommitted changes
-        if (name === "shazam_impact") {
-            ctx.ui?.notify?.("tip: run shazam_verify first to establish a baseline before assessing impact", "info");
+        if (name === "code_impact") {
+            ctx.ui?.notify?.("tip: run code_verify first to establish a baseline before assessing impact", "info");
             return;
         }
         // Before rename_symbol: suggest call_chain first
-        if (name === "shazam_rename_symbol") {
-            ctx.ui?.notify?.("tip: run shazam_call_chain first to verify all references before renaming", "info");
+        if (name === "code_rename_symbol") {
+            ctx.ui?.notify?.("tip: run code_call_chain first to verify all references before renaming", "info");
             return;
         }
     });
 }
-//# sourceMappingURL=shazam-guide.js.map
+//# sourceMappingURL=code-guide.js.map

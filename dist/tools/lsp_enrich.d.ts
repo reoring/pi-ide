@@ -1,5 +1,5 @@
 /**
- * pi-shazam tools/lsp_enrich — Tool-layer wrappers for LSP enrichment.
+ * code tools/lsp_enrich — Tool-layer wrappers for LSP enrichment.
  *
  * Provides helpers that tools/ call to enrich tree-sitter graph data
  * with LSP results (workspace/symbol, documentSymbol, semanticTokens,

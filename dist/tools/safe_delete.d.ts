@@ -1,5 +1,5 @@
 /**
- * pi-shazam tools/safe_delete — Safe symbol/file deletion with call_chain verification.
+ * code tools/safe_delete — Safe symbol/file deletion with call_chain verification.
  *
  * Confirms zero references via call_chain before allowing deletion.
  * This is a WRITE operation — it modifies files on disk.

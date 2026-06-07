@@ -1,5 +1,5 @@
 /**
- * pi-shazam lsp/setup — /shazam-setup command: detect + install guidance.
+ * pi-ide lsp/setup — /code-setup command: detect + install guidance.
  *
  * Scans the project for supported languages, detects installed LSP servers,
  * and outputs install instructions for missing ones.
@@ -61,7 +61,7 @@ export function detectLspServers(projectRoot, languages) {
 }
 // ── Setup command handler ────────────────────────────────────────────────────
 /**
- * Generate the /shazam-setup output as a formatted string.
+ * Generate the /code-setup output as a formatted string.
  */
 export function generateSetupReport(projectRoot, languages) {
     const detections = detectLspServers(projectRoot, languages);
@@ -76,7 +76,7 @@ export function generateSetupReport(projectRoot, languages) {
         }
     }
     const lines = [];
-    lines.push("## Shazam LSP Setup");
+    lines.push("## Pi IDE LSP Setup");
     lines.push("");
     lines.push(`Project: ${projectRoot}`);
     lines.push(`Detected languages: ${detections.map((d) => d.language).join(", ") || "none"}`);

@@ -1,5 +1,5 @@
 /**
- * pi-shazam core/filter — Shared file filtering utilities.
+ * pi-ide core/filter — Shared file filtering utilities.
  *
  * Centralises the "is this a source file?" logic used by hotspots, orphan,
  * verify, overview, and check tools. Keeps filtering consistent across the

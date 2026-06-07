@@ -1,5 +1,5 @@
 /**
- * pi-shazam tools/overview — Project structure summary.
+ * code tools/overview — Project structure summary.
  *
  * Includes HTTP route inventory (absorbed from tools/routes.ts).
  */

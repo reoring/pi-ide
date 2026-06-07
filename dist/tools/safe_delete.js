@@ -3,7 +3,7 @@ import { getNextForTool, formatNextSection } from "../core/output.js";
 import { createTool } from "./_factory.js";
 export function registerSafeDelete(pi) {
     createTool(pi, {
-        name: "shazam_safe_delete",
+        name: "code_safe_delete",
         label: "Safe Delete",
         description: `\
 		Required safety gate before removing any symbol. Automatically
@@ -61,7 +61,7 @@ export function executeSafeDelete(graph, symbolName, dryRun = true) {
             line: symbol.line,
             kind: symbol.kind,
             dryRun,
-            message: `Symbol "${symbolName}" still has ${incoming.length} incoming reference(s). Cannot safely delete. Use shazam_call_chain --symbol ${symbolName} to review.`,
+            message: `Symbol "${symbolName}" still has ${incoming.length} incoming reference(s). Cannot safely delete. Use code_call_chain --symbol ${symbolName} to review.`,
         };
     }
     const filePath = symbol.file;

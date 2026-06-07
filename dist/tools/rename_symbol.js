@@ -3,13 +3,13 @@ import { getNextForTool, formatNextSection } from "../core/output.js";
 import { createTool } from "./_factory.js";
 export function registerRenameSymbol(pi) {
     createTool(pi, {
-        name: "shazam_rename_symbol",
+        name: "code_rename_symbol",
         label: "Rename Symbol",
         description: `\
 		Required safety gate before renaming any symbol. Step 1: call
-		shazam_call_chain to review all references. Step 2: use this to
+		code_call_chain to review all references. Step 2: use this to
 		perform the project-wide rename via LSP textDocument/rename. Step 3:
-		call shazam_verify to confirm no broken references. This is a WRITE
+		call code_verify to confirm no broken references. This is a WRITE
 		operation — do not manually find-and-replace; missed references
 		become bugs.`,
         params: Type.Object({

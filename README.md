@@ -2,7 +2,7 @@
 
 IDE-style code intelligence for the Pi coding agent.
 
-This package is a maintained local fork of `pi-shazam@0.3.2`, derived from the MIT-licensed npm tarball. It keeps the existing `shazam_*` tool names for compatibility, but changes the safety defaults for large workspaces:
+This package is a maintained fork of `pi-shazam@0.3.2`, derived from the MIT-licensed npm tarball and renamed around practical `code_*` tools for Pi. It changes the safety defaults for large workspaces:
 
 - startup overview scanning is disabled by default
 - post-edit auto-verify scanning is disabled by default
@@ -42,22 +42,22 @@ Or with `.pi-ide.json` in the project root:
 
 ## Tools
 
-The tool names remain compatible with the upstream package:
+The extension registers practical `code_*` tool names:
 
-- `shazam_overview`
-- `shazam_impact`
-- `shazam_codesearch`
-- `shazam_symbol`
-- `shazam_hover`
-- `shazam_file_detail`
-- `shazam_call_chain`
-- `shazam_find_tests`
-- `shazam_hotspots`
-- `shazam_type_hierarchy`
-- `shazam_verify`
-- `shazam_fix`
-- `shazam_rename_symbol`
-- `shazam_safe_delete`
+- `code_overview`
+- `code_impact`
+- `code_search`
+- `code_symbol`
+- `code_hover`
+- `code_file_detail`
+- `code_call_chain`
+- `code_find_tests`
+- `code_hotspots`
+- `code_type_hierarchy`
+- `code_verify`
+- `code_fix`
+- `code_rename_symbol`
+- `code_safe_delete`
 
 ## Provenance
 

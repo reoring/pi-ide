@@ -1,5 +1,5 @@
 /**
- * pi-shazam hooks/after-write — Auto-verify after write/edit operations.
+ * pi-ide hooks/after-write — Auto-verify after write/edit operations.
  *
  * Registered on the `tool_result` event. When the LLM writes or edits a file,
  * this hook automatically runs diagnostics (scan + verify) and sends findings

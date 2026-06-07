@@ -1,5 +1,5 @@
 /**
- * pi-shazam tools/symbol — Symbol lookup with optional LSP enrichment.
+ * code tools/symbol — Symbol lookup with optional LSP enrichment.
  *
  * Supports two modes:
  *   - default: standard symbol lookup with definition, kind, signature, callers, callees

@@ -1,5 +1,5 @@
 /**
- * pi-shazam hooks/after-write — Auto-verify after write/edit operations.
+ * pi-ide hooks/after-write — Auto-verify after write/edit operations.
  *
  * Registered on the `tool_result` event. When the LLM writes or edits a file,
  * this hook automatically runs diagnostics (scan + verify) and sends findings
@@ -8,7 +8,7 @@
 import { scanProject } from "../core/scanner.js";
 import { diffBaseline } from "../core/cache.js";
 function isAutoVerifyEnabled() {
-    const value = process.env.PI_IDE_AUTO_VERIFY ?? process.env.PI_SHAZAM_AUTO_VERIFY;
+    const value = process.env.PI_IDE_AUTO_VERIFY;
     return value === "1" || value?.toLowerCase() === "true" || value?.toLowerCase() === "yes";
 }
 /** Tool names that trigger auto-verify */
@@ -79,7 +79,7 @@ export function handleWriteResult(toolName, projectRoot) {
         }
         lines.push(`- Total edges in graph: ${edgeCount}`);
         lines.push("");
-        lines.push("Run `shazam_verify` for full diagnostics including LSP checks and risk assessment.");
+        lines.push("Run `code_verify` for full diagnostics including LSP checks and risk assessment.");
         return lines.join("\n");
     }
     catch (err) {
@@ -105,7 +105,7 @@ export function registerAfterWriteHook(pi) {
             const findings = handleWriteResult(event.toolName, ".");
             // Send findings as a message to the LLM
             pi.sendMessage({
-                customType: "shazam-auto-verify",
+                customType: "code-auto-verify",
                 content: findings,
                 display: true,
             });

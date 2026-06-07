@@ -1,5 +1,5 @@
 /**
- * pi-shazam tools/verify — Unified post-edit verification gate.
+ * code tools/verify — Unified post-edit verification gate.
  *
  * Merges verify, check, and ready into one tool:
  *   1. LSP diagnostics (CORE) — type errors, warnings from language servers

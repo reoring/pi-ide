@@ -1,5 +1,5 @@
 /**
- * pi-shazam core/scanner — Project scanning + graph building.
+ * pi-ide core/scanner — Project scanning + graph building.
  *
  * Walks project directories, parses source files with tree-sitter,
  * extracts symbols/imports/calls, and builds the full RepoGraph.

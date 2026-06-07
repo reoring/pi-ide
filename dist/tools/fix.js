@@ -6,10 +6,10 @@ import { join } from "node:path";
 import { getNextForTool, formatNextSection } from "../core/output.js";
 export function registerFix(pi) {
     createTool(pi, {
-        name: "shazam_fix",
+        name: "code_fix",
         label: "Auto-Fix Format & Lint",
         description: `\
-		When shazam_verify reports format or lint errors, use this to
+		When code_verify reports format or lint errors, use this to
 		auto-fix them. Runs nearest-wins formatters (prettier, biome, eslint
 		--fix, ruff, cargo fmt, gofmt). Format only — never touches logic.
 		Always run with --dry-run first to preview changes before applying.`,

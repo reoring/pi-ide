@@ -1,5 +1,5 @@
 /**
- * pi-shazam tools/impact — Change blast radius analysis.
+ * code tools/impact — Change blast radius analysis.
  */
 import type { ExtensionAPI } from "../types/pi-extension.js";
 import type { RepoGraph } from "../core/graph.js";

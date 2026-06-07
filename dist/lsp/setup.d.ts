@@ -1,5 +1,5 @@
 /**
- * pi-shazam lsp/setup — /shazam-setup command: detect + install guidance.
+ * pi-ide lsp/setup — /code-setup command: detect + install guidance.
  *
  * Scans the project for supported languages, detects installed LSP servers,
  * and outputs install instructions for missing ones.
@@ -13,7 +13,7 @@ export type { LspServerDetection };
  */
 export declare function detectLspServers(projectRoot: string, languages?: string[]): LspServerDetection[];
 /**
- * Generate the /shazam-setup output as a formatted string.
+ * Generate the /code-setup output as a formatted string.
  */
 export declare function generateSetupReport(projectRoot: string, languages?: string[]): string;
 /**

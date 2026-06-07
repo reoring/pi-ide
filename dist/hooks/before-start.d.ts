@@ -1,5 +1,5 @@
 /**
- * pi-shazam hooks/before-start — Inject project overview into system prompt.
+ * pi-ide hooks/before-start — Inject project overview into system prompt.
  *
  * Registered on the `before_agent_start` event. Scans the project with
  * tree-sitter, generates an overview, and injects it into the system prompt
@@ -13,7 +13,7 @@ import type { ExtensionAPI } from "../types/pi-extension.js";
  * Generate a project overview string suitable for system prompt injection.
  *
  * @param projectRoot - Absolute or relative path to the project root
- * @returns A formatted overview string prefixed with [pi-shazam] tag
+ * @returns A formatted overview string prefixed with [pi-ide] tag
  */
 export declare function generateOverviewForPrompt(projectRoot: string): string;
 /**

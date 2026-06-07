@@ -1,5 +1,5 @@
 /**
- * Log shazam tool calls to ~/.pi/hooks/audit/shazam-calls.log (JSONL).
+ * Log code tool calls to ~/.pi/hooks/audit/code-calls.log (JSONL).
  *
  * Each log entry captures the full result text (truncated at 10KB) for debugging:
  * - call:   ts, project, tool, params
@@ -11,7 +11,7 @@ import { appendFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 const AUDIT_DIR = join(homedir(), ".pi", "hooks", "audit");
-const LOG_FILE = join(AUDIT_DIR, "shazam-calls.log");
+const LOG_FILE = join(AUDIT_DIR, "code-calls.log");
 const MAX_RESULT_CHARS = 10_000;
 const _starts = new Map();
 function ensureDir() {
@@ -34,8 +34,8 @@ function write(entry) {
         /* silent */
     }
 }
-function isShazam(name) {
-    return name.startsWith("shazam_");
+function isIdeTool(name) {
+    return name.startsWith("code_");
 }
 function summarize(v) {
     if (v === null || v === undefined)
@@ -55,7 +55,7 @@ function summarize(v) {
 }
 export function registerToolLogger(pi) {
     pi.on("tool_call", (event, ctx) => {
-        if (!isShazam(event.toolName))
+        if (!isIdeTool(event.toolName))
             return;
         const t0 = Date.now();
         _starts.set(event.toolCallId, t0);
@@ -69,7 +69,7 @@ export function registerToolLogger(pi) {
         });
     });
     pi.on("tool_result", (event, ctx) => {
-        if (!isShazam(event.toolName))
+        if (!isIdeTool(event.toolName))
             return;
         const start = _starts.get(event.toolCallId);
         const durationMs = start != null ? Date.now() - start : -1;

@@ -1,5 +1,5 @@
 /**
- * pi-shazam core/treesitter — Tree-sitter AST parsing + symbol extraction.
+ * pi-ide core/treesitter — Tree-sitter AST parsing + symbol extraction.
  *
  * Ported from repomap/src/parser.py (TreeSitterAdapter).
  *

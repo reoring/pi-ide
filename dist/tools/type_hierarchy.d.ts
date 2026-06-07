@@ -1,5 +1,5 @@
 /**
- * pi-shazam tools/type_hierarchy — LSP type hierarchy + implementations.
+ * code tools/type_hierarchy — LSP type hierarchy + implementations.
  *
  * Uses LSP 3.17 textDocument/typeHierarchy for bidirectional traversal
  * (supertypes and subtypes). Falls back to graph inheritance edges

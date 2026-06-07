@@ -1,5 +1,5 @@
 /**
- * pi-shazam core/filter — Shared file filtering utilities.
+ * pi-ide core/filter — Shared file filtering utilities.
  *
  * Centralises the "is this a source file?" logic used by hotspots, orphan,
  * verify, overview, and check tools. Keeps filtering consistent across the
@@ -42,7 +42,7 @@ const DEFAULT_SKIP_DIRS = [
     ".git",
     ".cache",
     ".worktrees",
-    ".pi-shazam",
+    ".pi-ide",
     ".qoder",
     "__pycache__",
     "coverage",
@@ -84,10 +84,7 @@ function parseList(value) {
 }
 function readJsonConfig() {
     try {
-        const candidates = [
-            join(process.cwd(), ".pi-ide.json"),
-            join(process.cwd(), ".pi-shazam.json"),
-        ];
+        const candidates = [join(process.cwd(), ".pi-ide.json")];
         for (const file of candidates) {
             if (!existsSync(file))
                 continue;
@@ -103,7 +100,6 @@ function readJsonConfig() {
 export const SKIP_DIRS = new Set([
     ...DEFAULT_SKIP_DIRS,
     ...parseList(process.env.PI_IDE_SKIP_DIRS),
-    ...parseList(process.env.PI_SHAZAM_SKIP_DIRS),
     ...readJsonConfig(),
 ]);
 export function isNonSourceFile(file) {

@@ -1,5 +1,5 @@
 /**
- * pi-shazam tools/_factory — Tool registration factory.
+ * code tools/_factory — Tool registration factory.
  *
  * Eliminates per-tool boilerplate by centralizing:
  * - json/maxTokens parameter defaults (merged with tool-specific params)

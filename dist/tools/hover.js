@@ -6,10 +6,10 @@ import { getNextForTool, formatNextSection } from "../core/output.js";
 import { createTool } from "./_factory.js";
 export function registerHover(pi) {
     createTool(pi, {
-        name: "shazam_hover",
+        name: "code_hover",
         label: "Symbol Hover Info",
         description: `\
-		After finding a symbol with shazam_symbol, use this to get its full
+		After finding a symbol with code_symbol, use this to get its full
 		type signature, documentation comments, and JSDoc — content that raw
 		file reads miss. Connects to LSP hover providers for rich type info.
 		Falls back to graph metadata when LSP is unavailable.`,
@@ -143,7 +143,7 @@ function formatHoverResult(result, name) {
     else {
         lines.push("*No LSP hover info available.*");
         lines.push("");
-        lines.push('Run with diagnostics="lsp" in shazam_check to ensure LSP servers are initialized.');
+        lines.push("Run `code_verify --lspOnly true` to check whether LSP diagnostics are available.");
     }
     return lines.join("\n");
 }

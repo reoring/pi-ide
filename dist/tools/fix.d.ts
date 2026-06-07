@@ -1,5 +1,5 @@
 /**
- * pi-shazam tools/fix — Auto-fix lint/format.
+ * code tools/fix — Auto-fix lint/format.
  *
  * Scans source files for common format issues and offers fixes.
  * In dry-run mode, previews what would change without modifying files.

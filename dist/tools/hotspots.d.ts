@@ -1,5 +1,5 @@
 /**
- * pi-shazam tools/hotspots — Complexity hotspot ranking.
+ * code tools/hotspots — Complexity hotspot ranking.
  */
 import type { ExtensionAPI } from "../types/pi-extension.js";
 import type { RepoGraph } from "../core/graph.js";

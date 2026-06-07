@@ -1,17 +1,17 @@
 /**
- * pi-shazam core/git-hooks — Git pre-commit hook integration.
+ * pi-ide core/git-hooks — Git pre-commit hook integration.
  *
- * Installs a pre-commit hook that runs shazam_verify --preCommit
+ * Installs a pre-commit hook that runs code_verify --preCommit
  * before allowing a commit. Blocks commit on FAIL verdict.
  *
  * The hook is installed as .git/hooks/pre-commit in the project root.
- * It calls npx shazam_verify (via the Pi extension's verify tool)
+ * It calls npx code_verify (via the Pi extension's verify tool)
  * through the MCP entry point.
  */
 /**
  * Install the pre-commit git hook for the given project.
  *
- * Writes .git/hooks/pre-commit with the shazam verify script
+ * Writes .git/hooks/pre-commit with the ide verify script
  * and makes it executable.
  *
  * @param projectRoot - Absolute path to the project root
@@ -22,7 +22,7 @@ export declare function installPreCommitHook(projectRoot: string): string;
  * Check if the pre-commit hook is installed for the given project.
  *
  * @param projectRoot - Absolute path to the project root
- * @returns True if the shazam pre-commit hook is installed
+ * @returns True if the pi-ide pre-commit hook is installed
  */
 export declare function isPreCommitHookInstalled(projectRoot: string): boolean;
 /**

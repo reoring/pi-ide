@@ -1,5 +1,5 @@
 /**
- * pi-shazam lsp/client — LSP protocol communication (JSON-RPC over stdio).
+ * pi-ide lsp/client — LSP protocol communication (JSON-RPC over stdio).
  *
  * Uses vscode-jsonrpc/node for wire protocol handling
  * (StreamMessageReader / StreamMessageWriter + createMessageConnection).

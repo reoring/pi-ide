@@ -1,5 +1,5 @@
 /**
- * Log shazam tool calls to ~/.pi/hooks/audit/shazam-calls.log (JSONL).
+ * Log code tool calls to ~/.pi/hooks/audit/code-calls.log (JSONL).
  *
  * Each log entry captures the full result text (truncated at 10KB) for debugging:
  * - call:   ts, project, tool, params

@@ -1,5 +1,5 @@
 /**
- * pi-shazam tools/find_tests — Test file finder.
+ * code tools/find_tests — Test file finder.
  *
  * Locates test files for a given source file or module using common
  * naming conventions (*.test.ts, *.spec.ts, __tests__/ directories).
@@ -12,7 +12,7 @@ import { isNonSourceFile } from "../core/filter.js";
 import { getNextForTool, formatNextSection } from "../core/output.js";
 export function registerFindTests(pi) {
     createTool(pi, {
-        name: "shazam_find_tests",
+        name: "code_find_tests",
         label: "Find Test Files",
         description: `\
 		When adding tests or modifying source code — use this to discover

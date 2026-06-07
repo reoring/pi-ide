@@ -40,7 +40,7 @@ const ROUTE_REGISTRATION_PATTERNS = [
 ];
 export function registerOverview(pi) {
     createTool(pi, {
-        name: "shazam_overview",
+        name: "code_overview",
         label: "Project Overview",
         description: `\
 		When you first enter a project or return after changes — use this to

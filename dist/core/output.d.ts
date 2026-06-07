@@ -1,5 +1,5 @@
 /**
- * pi-shazam core/output — Standardized tool output formatting.
+ * pi-ide core/output — Standardized tool output formatting.
  *
  * All tool outputs follow a three-section skeleton:
  *   1. ## Result Summary (key-value table / quick summary)

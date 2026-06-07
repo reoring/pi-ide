@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * pi-shazam MCP server — exposes codebase analysis tools via Model Context Protocol.
+ * pi-ide MCP server — exposes codebase analysis tools via Model Context Protocol.
  *
- * Usage: npx pi-shazam-mcp
+ * Usage: npx pi-ide-mcp
  *
  * Clients (Cursor, Claude Desktop, Windsurf, Qoder) launch this process
  * and communicate via stdio JSON-RPC.
@@ -14,7 +14,7 @@ import { registerAllTools } from "./tools.js";
 const PROJECT_ROOT = process.argv[2] || ".";
 async function main() {
     const server = new McpServer({
-        name: "pi-shazam",
+        name: "pi-ide",
         version: "0.2.0",
     });
     // Scan project (builds symbol graph, may take 1-5s for large projects)
@@ -26,7 +26,7 @@ async function main() {
     await server.connect(transport);
 }
 main().catch((err) => {
-    console.error("pi-shazam MCP server failed to start:", err);
+    console.error("pi-ide MCP server failed to start:", err);
     process.exit(1);
 });
 //# sourceMappingURL=entry.js.map

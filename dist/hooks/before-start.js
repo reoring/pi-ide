@@ -1,5 +1,5 @@
 /**
- * pi-shazam hooks/before-start — Inject project overview into system prompt.
+ * pi-ide hooks/before-start — Inject project overview into system prompt.
  *
  * Registered on the `before_agent_start` event. Scans the project with
  * tree-sitter, generates an overview, and injects it into the system prompt
@@ -13,7 +13,7 @@ import { executeOverview } from "../tools/overview.js";
 import { hasTestFiles, hasHierarchyKinds } from "../core/output.js";
 import { execSync } from "node:child_process";
 function isAutoOverviewEnabled() {
-    const value = process.env.PI_IDE_AUTO_OVERVIEW ?? process.env.PI_SHAZAM_AUTO_OVERVIEW;
+    const value = process.env.PI_IDE_AUTO_OVERVIEW;
     return value === "1" || value?.toLowerCase() === "true" || value?.toLowerCase() === "yes";
 }
 /**
@@ -43,27 +43,27 @@ function buildProactiveRecommendations(projectRoot) {
         lines.push("### Proactive Recommendations");
         lines.push("");
         if (uncommitted > 0) {
-            lines.push(`- [REQUIRED] You have ${uncommitted} uncommitted change(s). Run \`shazam_verify --preCommit\` before committing.`);
+            lines.push(`- [REQUIRED] You have ${uncommitted} uncommitted change(s). Run \`code_verify --preCommit\` before committing.`);
         }
-        lines.push("- Before editing any file for the first time: \`shazam_file_detail --file <path>\`");
-        lines.push("- Before changing a shared/exported symbol: \`shazam_call_chain --symbol <name>\`");
+        lines.push("- Before editing any file for the first time: \`code_file_detail --file <path>\`");
+        lines.push("- Before changing a shared/exported symbol: \`code_call_chain --symbol <name>\`");
         if (hasTests) {
-            lines.push("- Before adding/modifying code: \`shazam_find_tests --sourceFile <file>\` to find related tests");
+            lines.push("- Before adding/modifying code: \`code_find_tests --sourceFile <file>\` to find related tests");
         }
         if (hasHierarchy) {
-            lines.push("- When working with OOP types: \`shazam_type_hierarchy --name <class>\` for inheritance chain");
+            lines.push("- When working with OOP types: \`code_type_hierarchy --name <class>\` for inheritance chain");
         }
-        lines.push("- When editing 2+ files: \`shazam_impact --files <file1> <file2>\` to assess blast radius");
-        lines.push("- After every edit: \`shazam_verify\` to check for errors");
-        lines.push("- Instead of grep: \`shazam_codesearch --query <keyword>\` for ranked results");
+        lines.push("- When editing 2+ files: \`code_impact --files <file1> <file2>\` to assess blast radius");
+        lines.push("- After every edit: \`code_verify\` to check for errors");
+        lines.push("- Instead of grep: \`code_search --query <keyword>\` for ranked results");
     }
     catch {
         // If scan fails, provide minimal recommendations
         lines.push("### Recommendations");
         lines.push("");
-        lines.push("- \`shazam_overview\` to understand project structure");
-        lines.push("- \`shazam_file_detail --file <path>\` before editing any file");
-        lines.push("- \`shazam_verify\` after every edit");
+        lines.push("- \`code_overview\` to understand project structure");
+        lines.push("- \`code_file_detail --file <path>\` before editing any file");
+        lines.push("- \`code_verify\` after every edit");
     }
     return lines.join("\n");
 }
@@ -71,13 +71,13 @@ function buildProactiveRecommendations(projectRoot) {
  * Generate a project overview string suitable for system prompt injection.
  *
  * @param projectRoot - Absolute or relative path to the project root
- * @returns A formatted overview string prefixed with [pi-shazam] tag
+ * @returns A formatted overview string prefixed with [pi-ide] tag
  */
 export function generateOverviewForPrompt(projectRoot) {
     const graph = scanProject(projectRoot, () => { });
     const overview = executeOverview(graph, projectRoot);
     const recommendations = buildProactiveRecommendations(projectRoot);
-    return `[pi-shazam] Project Overview:\n${overview}\n\n${recommendations}`;
+    return `[pi-ide] Project Overview:\n${overview}\n\n${recommendations}`;
 }
 /**
  * Register the before-start hook on the Pi extension API.
@@ -99,7 +99,7 @@ export function registerBeforeStartHook(pi) {
             };
         }
         catch (err) {
-            pi.logger?.warn(`[pi-shazam] Failed to generate overview: ${err}`);
+            pi.logger?.warn(`[pi-ide] Failed to generate overview: ${err}`);
             // Don't block agent start on overview failure
             return undefined;
         }

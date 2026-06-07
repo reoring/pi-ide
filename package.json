@@ -6,8 +6,7 @@
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"bin": {
-		"pi-ide-mcp": "dist/mcp/entry.js",
-		"pi-shazam-mcp": "dist/mcp/entry.js"
+		"pi-ide-mcp": "dist/mcp/entry.js"
 	},
 	"files": [
 		"dist/**/*"

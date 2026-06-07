@@ -1,5 +1,5 @@
 /**
- * pi-shazam core/treesitter-queries — Tree-sitter query patterns for 18 languages.
+ * pi-ide core/treesitter-queries — Tree-sitter query patterns for 18 languages.
  *
  * Ported from repomap/src/queries.py.
  * Each language has patterns for: function, class, import, call, http_route.

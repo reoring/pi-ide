@@ -4,7 +4,7 @@ import { isNonSourceFile } from "../core/filter.js";
 import { getNextForTool, formatNextSection } from "../core/output.js";
 export function registerHotspots(pi) {
     createTool(pi, {
-        name: "shazam_hotspots",
+        name: "code_hotspots",
         label: "Complexity Hotspots",
         description: `\
 		Without this, you optimize the wrong files. Returns files ranked by
