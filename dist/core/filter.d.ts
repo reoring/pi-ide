@@ -14,4 +14,3 @@
  */
 export declare const SKIP_DIRS: Set<string>;
 export declare function isNonSourceFile(file: string): boolean;
-//# sourceMappingURL=filter.d.ts.map

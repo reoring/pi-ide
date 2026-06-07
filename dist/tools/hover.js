@@ -147,4 +147,3 @@ function formatHoverResult(result, name) {
     }
     return lines.join("\n");
 }
-//# sourceMappingURL=hover.js.map

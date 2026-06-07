@@ -31,4 +31,3 @@ export declare function getProjectGraph(projectRoot?: string, log?: (msg: string
  * @returns The fully built RepoGraph with PageRank scores set
  */
 export declare function scanProject(projectPath: string, log?: (msg: string) => void): RepoGraph;
-//# sourceMappingURL=scanner.d.ts.map

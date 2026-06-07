@@ -44,6 +44,7 @@ const DEFAULT_SKIP_DIRS = [
     ".worktrees",
     ".pi-ide",
     ".qoder",
+    "_agents",
     "__pycache__",
     "coverage",
     ".nyc_output",
@@ -105,4 +106,3 @@ export const SKIP_DIRS = new Set([
 export function isNonSourceFile(file) {
     return NON_SOURCE_FILE_PATTERNS.some((p) => file.includes(p));
 }
-//# sourceMappingURL=filter.js.map

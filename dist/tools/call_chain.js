@@ -224,4 +224,3 @@ export function formatFlatReferences(refs, symbolName) {
     }
     return lines.join("\n");
 }
-//# sourceMappingURL=call_chain.js.map

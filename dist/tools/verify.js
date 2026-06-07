@@ -2,7 +2,7 @@ import { Type } from "typebox";
 import { diffBaseline, loadBaseline } from "../core/cache.js";
 import { isNonSourceFile } from "../core/filter.js";
 import { execSync } from "node:child_process";
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, existsSync, readdirSync, statSync } from "fs";
 import { resolve } from "path";
 import { getNextForTool, formatNextSection, truncateOutput } from "../core/output.js";
 import { getLspManager } from "./_context.js";
@@ -53,12 +53,18 @@ export function registerVerify(pi) {
     });
 }
 // ── Async verify (LSP + graph, used by the tool) ────────────────────────────
-async function executeVerifyJsonAsync(projectRoot, options) {
-    const { scanProject } = await import("../core/scanner.js");
-    const graph = scanProject(projectRoot);
+export async function executeVerifyJsonAsync(projectRoot, options) {
     const quick = options.quick ?? false;
     const lspOnly = options.lspOnly ?? false;
     const preCommit = options.preCommit ?? false;
+    if (quick) {
+        return executeQuickVerifyJson(projectRoot, options);
+    }
+    if (lspOnly) {
+        return executeLspOnlyVerifyJson(projectRoot, options);
+    }
+    const { scanProject } = await import("../core/scanner.js");
+    const graph = scanProject(projectRoot);
     let edgeCount = 0;
     for (const [, edges] of graph.outgoing)
         edgeCount += edges.length;
@@ -107,12 +113,18 @@ async function executeVerifyJsonAsync(projectRoot, options) {
         preCommitMode: preCommit,
     };
 }
-async function executeVerifyTextAsync(projectRoot, options) {
-    const { scanProject } = await import("../core/scanner.js");
-    const graph = scanProject(projectRoot);
+export async function executeVerifyTextAsync(projectRoot, options) {
     const quick = options.quick ?? false;
     const lspOnly = options.lspOnly ?? false;
     const preCommit = options.preCommit ?? false;
+    if (quick) {
+        return executeQuickVerifyText(projectRoot, options);
+    }
+    if (lspOnly) {
+        return executeLspOnlyVerifyText(projectRoot, options);
+    }
+    const { scanProject } = await import("../core/scanner.js");
+    const graph = scanProject(projectRoot);
     const lines = [];
     const modeLabel = preCommit ? " (Pre-Commit)" : quick ? " (Quick)" : lspOnly ? " (LSP Only)" : "";
     lines.push(`## Verify Results${modeLabel}`);
@@ -230,6 +242,9 @@ async function executeVerifyTextAsync(projectRoot, options) {
 async function runLspDiagnostics(graph, projectRoot, options) {
     const maxFiles = options.maxFiles ?? 100;
     const targetFiles = [...graph.fileSymbols.keys()].filter((f) => !isNonSourceFile(f)).slice(0, maxFiles);
+    return runLspDiagnosticsForFiles(targetFiles, projectRoot);
+}
+async function runLspDiagnosticsForFiles(targetFiles, projectRoot) {
     if (targetFiles.length === 0)
         return { diagnostics: [], available: false };
     const lspManager = getLspManager();
@@ -270,6 +285,191 @@ async function runLspDiagnostics(graph, projectRoot, options) {
         }
     }
     return { diagnostics, available: serversUsed.size > 0 };
+}
+function countEdges(graph) {
+    let edgeCount = 0;
+    for (const [, edges] of graph.outgoing)
+        edgeCount += edges.length;
+    return edgeCount;
+}
+function assessQuickRisk(gitChangedFiles, preCommit) {
+    const count = gitChangedFiles.length;
+    const highThreshold = preCommit ? 30 : 60;
+    const mediumThreshold = preCommit ? 10 : 20;
+    if (count > highThreshold)
+        return { level: "high", reason: `${count} git-modified files; graph scan skipped.` };
+    if (count > mediumThreshold)
+        return { level: "medium", reason: `${count} git-modified files; graph scan skipped.` };
+    return { level: "low", reason: `${count} git-modified files; graph scan skipped.` };
+}
+function executeQuickVerifyJson(projectRoot, options) {
+    const preCommit = options.preCommit ?? false;
+    const gitChangedFiles = getGitChangedFiles(projectRoot);
+    const risk = assessQuickRisk(gitChangedFiles, preCommit);
+    return {
+        symbolCount: null,
+        fileCount: null,
+        edgeCount: null,
+        riskLevel: risk.level,
+        riskReason: risk.reason,
+        orphanCount: null,
+        orphans: [],
+        gitChangedFiles: gitChangedFiles.slice(0, 50),
+        baselineDiff: null,
+        lspDiagnostics: [],
+        lspAvailable: false,
+        verdict: preCommit && risk.level !== "low" ? "FAIL" : "PASS",
+        quickMode: true,
+        lspOnlyMode: false,
+        preCommitMode: preCommit,
+        graphSkipped: true,
+    };
+}
+function executeQuickVerifyText(projectRoot, options) {
+    const preCommit = options.preCommit ?? false;
+    const gitChangedFiles = getGitChangedFiles(projectRoot);
+    const risk = assessQuickRisk(gitChangedFiles, preCommit);
+    const lines = [];
+    lines.push(`## Verify Results${preCommit ? " (Pre-Commit)" : " (Quick)"}`);
+    lines.push("");
+    lines.push("**Mode:** Quick git-change check (graph scan skipped)");
+    lines.push("");
+    lines.push("### Git Working Tree Changes");
+    if (gitChangedFiles.length > 0) {
+        lines.push(`Files changed: ${gitChangedFiles.length}`);
+        for (const f of gitChangedFiles.slice(0, 20))
+            lines.push(`  - ${f}`);
+        if (gitChangedFiles.length > 20)
+            lines.push(`  ... and ${gitChangedFiles.length - 20} more`);
+    }
+    else {
+        lines.push("No uncommitted changes.");
+    }
+    lines.push("");
+    lines.push("### Risk Level");
+    lines.push(`**${risk.level}** — ${risk.reason}`);
+    lines.push("");
+    lines.push("[Quick mode — skipped graph, orphan, baseline, and LSP analysis]");
+    return lines.join("\n");
+}
+async function executeLspOnlyVerifyJson(projectRoot, options) {
+    const preCommit = options.preCommit ?? false;
+    const targetFiles = getDiagnosticTargetFiles(projectRoot, options.maxFiles ?? 100);
+    const lspResult = await runLspDiagnosticsForFiles(targetFiles, projectRoot);
+    const hasErrors = lspResult.diagnostics.some((d) => d.severity === "error");
+    return {
+        symbolCount: null,
+        fileCount: targetFiles.length,
+        edgeCount: null,
+        riskLevel: "low",
+        riskReason: "LSP-only mode; graph scan skipped.",
+        orphanCount: null,
+        orphans: [],
+        gitChangedFiles: getGitChangedFiles(projectRoot).slice(0, 50),
+        baselineDiff: null,
+        lspDiagnostics: lspResult.diagnostics,
+        lspAvailable: lspResult.available,
+        verdict: hasErrors ? "FAIL" : lspResult.available ? "PASS" : "WARN",
+        quickMode: false,
+        lspOnlyMode: true,
+        preCommitMode: preCommit,
+        graphSkipped: true,
+    };
+}
+async function executeLspOnlyVerifyText(projectRoot, options) {
+    const targetFiles = getDiagnosticTargetFiles(projectRoot, options.maxFiles ?? 100);
+    const lspResult = await runLspDiagnosticsForFiles(targetFiles, projectRoot);
+    const lines = [];
+    lines.push("## Verify Results (LSP Only)");
+    lines.push("");
+    lines.push(`**Files checked:** ${targetFiles.length} | **Graph scan:** skipped`);
+    lines.push("");
+    lines.push("### LSP Diagnostics");
+    lines.push("");
+    if (!lspResult.available) {
+        lines.push("[WARN] LSP diagnostics unavailable — type/lint errors not checked.");
+    }
+    else if (lspResult.diagnostics.length === 0) {
+        lines.push("No diagnostics found.");
+    }
+    else {
+        const errors = lspResult.diagnostics.filter((d) => d.severity === "error");
+        const warnings = lspResult.diagnostics.filter((d) => d.severity === "warning");
+        lines.push(`Errors: ${errors.length} | Warnings: ${warnings.length} | Total: ${lspResult.diagnostics.length}`);
+        lines.push("");
+        for (const d of lspResult.diagnostics.slice(0, 50)) {
+            const sevLabel = d.severity.toUpperCase();
+            const code = d.code ? ` (${d.code})` : "";
+            lines.push(`- [${sevLabel}] ${d.file}:${d.line}:${d.col}${code} — ${d.message}`);
+        }
+        if (lspResult.diagnostics.length > 50)
+            lines.push(`... and ${lspResult.diagnostics.length - 50} more`);
+    }
+    lines.push("");
+    lines.push("[lspOnly mode — graph analysis skipped]");
+    return lines.join("\n");
+}
+const DIAGNOSTIC_EXTS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".go", ".rs", ".py", ".java", ".kt", ".c", ".cc", ".cpp", ".h", ".hpp", ".css", ".scss", ".html", ".vue", ".svelte"]);
+function getDiagnosticTargetFiles(projectRoot, maxFiles) {
+    const gitFiles = getGitTrackedFiles(projectRoot);
+    const files = gitFiles.length > 0 ? gitFiles : walkDiagnosticFiles(projectRoot, maxFiles);
+    return files.filter((f) => isDiagnosticSourceFile(f)).slice(0, maxFiles);
+}
+function isDiagnosticSourceFile(filePath) {
+    if (isNonSourceFile(filePath))
+        return false;
+    const idx = filePath.lastIndexOf(".");
+    if (idx < 0)
+        return false;
+    return DIAGNOSTIC_EXTS.has(filePath.slice(idx).toLowerCase());
+}
+function getGitTrackedFiles(projectRoot) {
+    try {
+        const output = execSync("git ls-files", { cwd: projectRoot, encoding: "utf-8", timeout: 5000 }).trim();
+        return output ? output.split("\n").filter(Boolean) : [];
+    }
+    catch {
+        return [];
+    }
+}
+function walkDiagnosticFiles(projectRoot, maxFiles) {
+    const out = [];
+    const skipDirs = new Set([".git", "node_modules", "dist", "build", ".next", ".cache", ".tmp", "_agents", "target", "__pycache__"]);
+    function walk(dir, prefix = "") {
+        if (out.length >= maxFiles)
+            return;
+        let entries = [];
+        try {
+            entries = readdirSync(dir, { withFileTypes: true });
+        }
+        catch {
+            return;
+        }
+        for (const entry of entries) {
+            if (out.length >= maxFiles)
+                return;
+            if (entry.isDirectory()) {
+                if (skipDirs.has(entry.name) || (entry.name.startsWith(".") && entry.name !== ".github"))
+                    continue;
+                walk(resolve(dir, entry.name), prefix ? `${prefix}/${entry.name}` : entry.name);
+            }
+            else if (entry.isFile()) {
+                const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+                try {
+                    const st = statSync(resolve(projectRoot, rel));
+                    if (st.size > 1024 * 1024)
+                        continue;
+                }
+                catch {
+                    continue;
+                }
+                if (isDiagnosticSourceFile(rel))
+                    out.push(rel);
+            }
+        }
+    }
+    walk(projectRoot);
+    return out;
 }
 // ── Subprocess fallback diagnostics ─────────────────────────────────────────
 function detectProjectType(projectRoot) {
@@ -688,4 +888,3 @@ export function executeReadyJson(graph, projectRoot) {
         },
     });
 }
-//# sourceMappingURL=verify.js.map

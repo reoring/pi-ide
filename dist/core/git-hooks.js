@@ -180,4 +180,3 @@ export function runPreCommitVerify(projectRoot) {
         };
     }
 }
-//# sourceMappingURL=git-hooks.js.map

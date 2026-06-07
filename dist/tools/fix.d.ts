@@ -22,4 +22,3 @@ export declare function executeFix(graph: RepoGraph, projectRoot: string, option
  * Run fix analysis and return structured JSON.
  */
 export declare function executeFixJson(graph: RepoGraph, projectRoot: string, options?: FixOptions): string;
-//# sourceMappingURL=fix.d.ts.map

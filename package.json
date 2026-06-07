@@ -9,12 +9,13 @@
 		"pi-ide-mcp": "dist/mcp/entry.js"
 	},
 	"files": [
-		"dist/**/*"
+		"dist/**/*",
+		"!dist/**/*.map"
 	],
 	"scripts": {
-		"prebuild": "rm -rf dist",
-		"build": "tsc",
-		"typecheck": "tsc --noEmit",
+		"build": "npm run check:dist",
+		"typecheck": "npm run check:dist",
+		"check:dist": "find dist -name '*.js' -print0 | xargs -0 -r -n1 node --check",
 		"dev": "tsc --watch",
 		"prepublishOnly": "npm run build",
 		"test": "vitest run",

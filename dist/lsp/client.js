@@ -513,4 +513,3 @@ export function convertLocation(projectRoot, loc) {
         endCol: loc.range.end.character + 1,
     };
 }
-//# sourceMappingURL=client.js.map

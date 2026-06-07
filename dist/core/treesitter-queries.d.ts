@@ -16,4 +16,3 @@ export interface QueryDict {
     };
 }
 export declare const QUERIES: QueryDict;
-//# sourceMappingURL=treesitter-queries.d.ts.map

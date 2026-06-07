@@ -29,4 +29,3 @@ export declare function handleWriteResult(toolName: string, projectRoot: string)
  * findings via pi.sendMessage().
  */
 export declare function registerAfterWriteHook(pi: ExtensionAPI): void;
-//# sourceMappingURL=after-write.d.ts.map

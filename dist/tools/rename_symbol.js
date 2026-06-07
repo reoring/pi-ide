@@ -6,12 +6,11 @@ export function registerRenameSymbol(pi) {
         name: "code_rename_symbol",
         label: "Rename Symbol",
         description: `\
-		Required safety gate before renaming any symbol. Step 1: call
-		code_call_chain to review all references. Step 2: use this to
-		perform the project-wide rename via LSP textDocument/rename. Step 3:
-		call code_verify to confirm no broken references. This is a WRITE
-		operation — do not manually find-and-replace; missed references
-		become bugs.`,
+			Required planning step before renaming any symbol. Step 1: call
+			code_call_chain to review all references. Step 2: use this to
+			estimate the project-wide rename impact. Step 3: apply the rename
+			with your editor or LSP and call code_verify to confirm no broken
+			references.`,
         params: Type.Object({
             symbol: Type.String(),
             newName: Type.String(),
@@ -81,4 +80,3 @@ function formatRenameResult(result, symbolName, newName) {
     }
     return lines.join("\n");
 }
-//# sourceMappingURL=rename_symbol.js.map

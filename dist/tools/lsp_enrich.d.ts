@@ -70,4 +70,3 @@ export declare function lspSemanticTokens(ctx: LspEnrichContext | null, filePath
  * Returns null on timeout, no server, unsupported, or file not opened.
  */
 export declare function lspFoldingRanges(ctx: LspEnrichContext | null, filePath: string, timeoutMs?: number): Promise<FoldingRange[] | null>;
-//# sourceMappingURL=lsp_enrich.d.ts.map

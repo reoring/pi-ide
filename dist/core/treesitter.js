@@ -588,4 +588,3 @@ export class TreeSitterAdapter {
         return firstLine.length > 120 ? firstLine.slice(0, 117) + "..." : firstLine;
     }
 }
-//# sourceMappingURL=treesitter.js.map

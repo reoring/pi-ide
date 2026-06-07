@@ -185,4 +185,3 @@ export default function (pi) {
     registerSafeDelete(pi);
     log("pi-ide loaded");
 }
-//# sourceMappingURL=index.js.map

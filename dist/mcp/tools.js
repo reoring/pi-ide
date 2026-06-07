@@ -1,14 +1,14 @@
 import { z } from "zod";
 import { executeOverview } from "../tools/overview.js";
 import { executeImpact } from "../tools/impact.js";
-import { executeCodesearch } from "../tools/codesearch.js";
+import { executeCodesearch, executeFulltextSearch, formatFulltextResult } from "../tools/codesearch.js";
 import { executeSymbolWithMode } from "../tools/symbol.js";
 import { executeFileDetail } from "../tools/file_detail.js";
 import { executeCallChain, getFlatReferences, formatFlatReferences } from "../tools/call_chain.js";
 import { executeHover } from "../tools/hover.js";
 import { executeFindTests } from "../tools/find_tests.js";
 import { executeHotspots } from "../tools/hotspots.js";
-import { executeVerify } from "../tools/verify.js";
+import { executeVerifyTextAsync } from "../tools/verify.js";
 import { executeTypeHierarchy } from "../tools/type_hierarchy.js";
 import { executeRenameSymbol } from "../tools/rename_symbol.js";
 import { executeSafeDelete } from "../tools/safe_delete.js";
@@ -16,7 +16,7 @@ import { appendFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 // ── Logging ──────────────────────────────────────────────────────
-const LOG_DIR = join(homedir(), ".kimi-code", "audit");
+const LOG_DIR = join(homedir(), ".pi", "agent", "audit");
 function logMCP(entry) {
     try {
         mkdirSync(LOG_DIR, { recursive: true });
@@ -52,11 +52,13 @@ function withLogging(tool, fn) {
     };
 }
 // ── Registration ─────────────────────────────────────────────────
-export function registerAllTools(server, graph, projectRoot) {
+export function registerAllTools(server, graphOrProvider, projectRoot) {
+    const getGraph = typeof graphOrProvider === "function" ? graphOrProvider : () => graphOrProvider;
     server.registerTool("code_overview", {
         description: "When you first enter a project or return after changes — use this to understand the codebase before reading a single file. Returns module dependency map, top-10 PageRank files, key dependencies, recent git changes, entry points, reading order, and HTTP routes.",
         inputSchema: z.object({ filter: z.string().optional().describe("Optional keyword to filter files") }),
     }, withLogging("code_overview", async ({ filter }) => {
+        const graph = getGraph();
         const text = executeOverview(graph, projectRoot, filter);
         return { content: [{ type: "text", text }] };
     }));
@@ -64,6 +66,7 @@ export function registerAllTools(server, graph, projectRoot) {
         description: "Required before editing 2+ files or any shared/exported module. Returns every file, symbol, and test affected by your planned changes.",
         inputSchema: z.object({ files: z.array(z.string()).describe("List of file paths to analyze") }),
     }, withLogging("code_impact", async ({ files }) => {
+        const graph = getGraph();
         const text = executeImpact(graph, files);
         return { content: [{ type: "text", text }] };
     }));
@@ -72,9 +75,15 @@ export function registerAllTools(server, graph, projectRoot) {
         inputSchema: z.object({
             query: z.string().describe("Search query text"),
             target: z.enum(["symbol", "code"]).optional().default("symbol").describe("symbol or code"),
+            topN: z.number().int().positive().optional().describe("Maximum results"),
         }),
-    }, withLogging("code_search", async ({ query }) => {
-        const results = executeCodesearch(graph, query);
+    }, withLogging("code_search", async ({ query, target, topN }) => {
+        if ((target ?? "symbol") === "code") {
+            const results = executeFulltextSearch(query, topN);
+            return { content: [{ type: "text", text: formatFulltextResult(results, query) }] };
+        }
+        const graph = getGraph();
+        const results = executeCodesearch(graph, query, topN);
         return { content: [{ type: "text", text: JSON.stringify(results, null, 2) }] };
     }));
     server.registerTool("code_symbol", {
@@ -85,6 +94,7 @@ export function registerAllTools(server, graph, projectRoot) {
             file: z.string().optional().describe("Optional file path to scope the search"),
         }),
     }, withLogging("code_symbol", async ({ name, mode, file }) => {
+        const graph = getGraph();
         const text = executeSymbolWithMode(graph, name, mode, file);
         return { content: [{ type: "text", text }] };
     }));
@@ -92,6 +102,7 @@ export function registerAllTools(server, graph, projectRoot) {
         description: "When you are about to edit a file you have not read before — this shows structure (symbols, signatures, visibility, PageRank), not just syntax.",
         inputSchema: z.object({ file: z.string().describe("Path to the file to analyze") }),
     }, withLogging("code_file_detail", async ({ file }) => {
+        const graph = getGraph();
         const text = executeFileDetail(graph, file);
         return { content: [{ type: "text", text }] };
     }));
@@ -103,6 +114,7 @@ export function registerAllTools(server, graph, projectRoot) {
             flat: z.boolean().optional().default(false).describe("Return a flat list of all references"),
         }),
     }, withLogging("code_call_chain", async ({ symbol, depth, flat }) => {
+        const graph = getGraph();
         if (flat) {
             const refs = getFlatReferences(graph, symbol);
             const text = formatFlatReferences(refs, symbol);
@@ -118,6 +130,7 @@ export function registerAllTools(server, graph, projectRoot) {
             file: z.string().optional().describe("Optional file path to scope lookup"),
         }),
     }, withLogging("code_hover", async ({ name, file }) => {
+        const graph = getGraph();
         const result = await executeHover(graph, name, file);
         const text = JSON.stringify(result, null, 2);
         return { content: [{ type: "text", text }] };
@@ -129,6 +142,7 @@ export function registerAllTools(server, graph, projectRoot) {
             module: z.string().optional().describe("Module name to scope search"),
         }),
     }, withLogging("code_find_tests", async ({ sourceFile, module: mod }) => {
+        const graph = getGraph();
         const result = executeFindTests(graph, projectRoot, {
             sourceFile: sourceFile,
             module: mod,
@@ -139,6 +153,7 @@ export function registerAllTools(server, graph, projectRoot) {
         description: "Without this, you optimize the wrong files. Returns files ranked by (symbol density x PageRank) — where bugs have the highest blast radius.",
         inputSchema: z.object({}),
     }, withLogging("code_hotspots", async () => {
+        const graph = getGraph();
         const text = executeHotspots(graph);
         return { content: [{ type: "text", text }] };
     }));
@@ -149,7 +164,7 @@ export function registerAllTools(server, graph, projectRoot) {
             lspOnly: z.boolean().optional().default(false).describe("LSP diagnostics only, skip graph analysis"),
         }),
     }, withLogging("code_verify", async ({ quick, lspOnly }) => {
-        const text = executeVerify(graph, projectRoot, { quick: quick, lspOnly: lspOnly });
+        const text = await executeVerifyTextAsync(projectRoot, { quick: quick, lspOnly: lspOnly });
         return { content: [{ type: "text", text }] };
     }));
     server.registerTool("code_type_hierarchy", {
@@ -163,16 +178,18 @@ export function registerAllTools(server, graph, projectRoot) {
                 .describe("Traversal direction"),
         }),
     }, withLogging("code_type_hierarchy", async ({ name, direction }) => {
+        const graph = getGraph();
         const result = executeTypeHierarchy(graph, name, direction ?? "both");
         return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     }));
     server.registerTool("code_rename_symbol", {
-        description: "Safety gate before renaming. Step 1: call code_call_chain to review references. Step 2: use this to rename. Step 3: call code_verify to confirm.",
+        description: "Planning step before renaming. Step 1: call code_call_chain to review references. Step 2: use this to estimate impact. Step 3: apply the rename and call code_verify.",
         inputSchema: z.object({
             symbol: z.string().describe("Current symbol name to rename"),
             newName: z.string().describe("New symbol name"),
         }),
     }, withLogging("code_rename_symbol", async ({ symbol, newName }) => {
+        const graph = getGraph();
         const result = executeRenameSymbol(graph, symbol, newName);
         return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     }));
@@ -183,8 +200,8 @@ export function registerAllTools(server, graph, projectRoot) {
             dryRun: z.boolean().optional().default(true).describe("Preview only, do not modify files"),
         }),
     }, withLogging("code_safe_delete", async ({ symbol, dryRun }) => {
+        const graph = getGraph();
         const result = executeSafeDelete(graph, symbol, dryRun);
         return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
     }));
 }
-//# sourceMappingURL=tools.js.map

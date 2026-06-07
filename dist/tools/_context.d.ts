@@ -10,4 +10,3 @@
 import type { LspManager } from "../lsp/manager.js";
 export declare function setLspManager(mgr: LspManager): void;
 export declare function getLspManager(): LspManager | null;
-//# sourceMappingURL=_context.d.ts.map

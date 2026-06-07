@@ -10,4 +10,3 @@
  */
 import type { ExtensionAPI } from "./types/pi-extension.js";
 export default function (pi: ExtensionAPI): void;
-//# sourceMappingURL=index.d.ts.map

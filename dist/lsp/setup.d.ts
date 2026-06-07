@@ -21,4 +21,3 @@ export declare function generateSetupReport(projectRoot: string, languages?: str
  * for use in tool outputs.
  */
 export declare function getInstallInstructions(): Record<string, string[]>;
-//# sourceMappingURL=setup.d.ts.map

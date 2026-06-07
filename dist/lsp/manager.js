@@ -343,4 +343,3 @@ export class LspManager {
         this.servers.clear();
     }
 }
-//# sourceMappingURL=manager.js.map

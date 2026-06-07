@@ -116,4 +116,3 @@ export declare function estimateTokens(text: string): number;
  * Low-priority lines are replaced with "... and N more (truncated)".
  */
 export declare function truncateOutput(lines: string[], maxTokens: number): string;
-//# sourceMappingURL=output.d.ts.map

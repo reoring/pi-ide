@@ -19,4 +19,3 @@ interface HoverResult {
 }
 export declare function executeHover(graph: RepoGraph, name: string, file?: string): Promise<HoverResult>;
 export {};
-//# sourceMappingURL=hover.d.ts.map

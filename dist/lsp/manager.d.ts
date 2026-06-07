@@ -82,4 +82,3 @@ export declare class LspManager {
      */
     shutdown(): Promise<void>;
 }
-//# sourceMappingURL=manager.d.ts.map

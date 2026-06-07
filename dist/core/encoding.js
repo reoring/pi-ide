@@ -103,4 +103,3 @@ export function readFileWithEncoding(filePath, encoding) {
     }
     return iconv.decode(buffer, encoding);
 }
-//# sourceMappingURL=encoding.js.map

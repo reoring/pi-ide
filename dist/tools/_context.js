@@ -5,4 +5,3 @@ export function setLspManager(mgr) {
 export function getLspManager() {
     return _manager;
 }
-//# sourceMappingURL=_context.js.map

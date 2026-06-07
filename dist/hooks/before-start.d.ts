@@ -23,4 +23,3 @@ export declare function generateOverviewForPrompt(projectRoot: string): string;
  * into the system prompt array.
  */
 export declare function registerBeforeStartHook(pi: ExtensionAPI): void;
-//# sourceMappingURL=before-start.d.ts.map

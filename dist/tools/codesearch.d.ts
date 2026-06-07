@@ -3,6 +3,14 @@ import type { RepoGraph, Symbol } from "../core/graph.js";
 import { type EnrichedSymbolHit } from "./lsp_enrich.js";
 export declare function registerCodesearch(pi: ExtensionAPI): void;
 export declare function executeCodesearch(graph: RepoGraph, query: string, topN?: number): Symbol[];
+export interface FulltextSearchHit {
+    file: string;
+    line: number;
+    column: number;
+    text: string;
+}
+export declare function executeFulltextSearch(query: string, topN?: number): FulltextSearchHit[];
+export declare function formatFulltextResult(results: FulltextSearchHit[], query: string): string;
 /**
  * Result type covering both BM25 and LSP sources.
  */
@@ -16,4 +24,3 @@ export interface CodesearchHit {
  * LSP hits float to the top (via score boost).
  */
 export declare function mergeResults(graph: RepoGraph, bm25Syms: Symbol[], lspHits: EnrichedSymbolHit[], topN?: number): CodesearchHit[];
-//# sourceMappingURL=codesearch.d.ts.map

@@ -103,4 +103,3 @@ export function calculatePageRank(graph, damping = 0.85, maxIter = 50, tol = 1e-
         }
     }
 }
-//# sourceMappingURL=pagerank.js.map

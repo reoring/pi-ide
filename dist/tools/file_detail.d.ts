@@ -10,4 +10,3 @@ import type { RepoGraph } from "../core/graph.js";
 export declare function registerFileDetail(pi: ExtensionAPI): void;
 export declare function executeFileDetail(graph: RepoGraph, file: string): string;
 export declare function executeFileDetailJson(graph: RepoGraph, file: string): string;
-//# sourceMappingURL=file_detail.d.ts.map

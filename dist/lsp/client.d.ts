@@ -84,4 +84,3 @@ export interface RawLspDiagnostic {
 }
 export declare function convertDiagnostics(projectRoot: string, uri: string, rawDiagnostics: RawLspDiagnostic[]): LspDiagnostic[];
 export declare function convertLocation(projectRoot: string, loc: Location): LspLocation;
-//# sourceMappingURL=client.d.ts.map

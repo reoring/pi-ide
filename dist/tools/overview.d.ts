@@ -24,4 +24,3 @@ export declare function buildKeyDependenciesSection(projectRoot: string): string
  * Returns null when git is not available or the command fails.
  */
 export declare function buildRecentChangesSection(projectRoot: string): string | null;
-//# sourceMappingURL=overview.d.ts.map

@@ -15,12 +15,11 @@ const PROJECT_ROOT = process.argv[2] || ".";
 async function main() {
     const server = new McpServer({
         name: "pi-ide",
-        version: "0.2.0",
+        version: "0.1.0",
     });
-    // Scan project (builds symbol graph, may take 1-5s for large projects)
-    const graph = scanProject(PROJECT_ROOT);
-    // Register all 13 analysis tools
-    registerAllTools(server, graph, PROJECT_ROOT);
+    // Defer project scanning until a graph-backed tool is actually called.
+    const getGraph = () => scanProject(PROJECT_ROOT);
+    registerAllTools(server, getGraph, PROJECT_ROOT);
     // Start stdio transport
     const transport = new StdioServerTransport();
     await server.connect(transport);
@@ -29,4 +28,3 @@ main().catch((err) => {
     console.error("pi-ide MCP server failed to start:", err);
     process.exit(1);
 });
-//# sourceMappingURL=entry.js.map

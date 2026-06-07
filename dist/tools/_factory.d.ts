@@ -41,4 +41,3 @@ export interface ToolSpec<T extends TProperties> {
  *   merges json/maxTokens into the parameter schema.
  */
 export declare function createTool<T extends TProperties>(pi: ExtensionAPI, spec: ToolSpec<T>): void;
-//# sourceMappingURL=_factory.d.ts.map

@@ -9,4 +9,3 @@
  */
 import type { ExtensionAPI } from "../types/pi-extension.js";
 export declare function registerToolLogger(pi: ExtensionAPI): void;
-//# sourceMappingURL=tool-logger.d.ts.map

@@ -13,7 +13,7 @@ import { createRepoGraph, createEdge } from "./graph.js";
 import { calculatePageRank } from "./pagerank.js";
 import { readFileAdaptive } from "./encoding.js";
 import { getProjectCacheDir, saveGraphCache, loadGraphCache } from "./cache.js";
-import { SKIP_DIRS } from "./filter.js";
+import { SKIP_DIRS, isNonSourceFile } from "./filter.js";
 // ── Constants ────────────────────────────────────────────────────────────────
 /** Maximum files to scan (safety limit) */
 const MAX_FILES = 20_000;
@@ -215,13 +215,26 @@ export function scanProject(projectPath, log) {
             }
         }
         const hasChanges = changedFiles.length > 0 || newFiles.length > 0 || deletedFiles.length > 0;
-        if (!hasChanges) {
+        if (!hasChanges && !isGraphCacheIncomplete(diskCache.graph, files)) {
             // All mtimes match — use cached graph directly
             logger(`Cache hit: ${diskCache.graph.symbols.size} symbols loaded from disk`);
             cachedGraph = diskCache.graph;
             cachedProjectPath = root;
             cachedFiles = reconstructFileCache(diskCache.graph, diskCache.fileMtimes);
             return cachedGraph;
+        }
+        if (!hasChanges) {
+            logger("Cache invalid: graph coverage is incomplete; rebuilding");
+            const graph = scanFull(root, files, adapter, logger);
+            try {
+                const saveFileMtimes = getFileMtimes(root, files);
+                saveGraphCache(graph, saveFileMtimes, cachePath);
+                logger(`Graph cache saved: ${graph.symbols.size} symbols`);
+            }
+            catch (err) {
+                logger(`Failed to save graph cache: ${err}`);
+            }
+            return graph;
         }
         // Some files changed — load cache into memory, then incremental
         logger(`Cache partial hit: ${changedFiles.length} changed, ${newFiles.length} new, ${deletedFiles.length} deleted`);
@@ -396,6 +409,22 @@ function scanIncremental(root, files, adapter, logger) {
     calculatePageRank(graph);
     return graph;
 }
+function isGraphCacheIncomplete(graph, files) {
+    if (files.length === 0)
+        return false;
+    if (graph.symbols.size === 0)
+        return false;
+    const graphFiles = new Set([
+        ...graph.fileSymbols.keys(),
+        ...graph.fileImports.keys(),
+        ...graph.fileCalls.keys(),
+        ...graph.fileImportBindings.keys(),
+    ]);
+    if (graphFiles.size === 0)
+        return true;
+    const coverage = graphFiles.size / files.length;
+    return files.length >= 50 && coverage < 0.05;
+}
 // ── File collection ──────────────────────────────────────────────────────────
 function collectSourceFiles(root, maxFiles) {
     const files = [];
@@ -422,7 +451,7 @@ function collectSourceFiles(root, maxFiles) {
             }
             else if (entry.isFile()) {
                 const ext = entry.name.slice(entry.name.lastIndexOf(".")).toLowerCase();
-                if (SOURCE_EXTS.has(ext)) {
+                if (SOURCE_EXTS.has(ext) && !isNonSourceFile(relPath)) {
                     files.push(relPath);
                 }
             }
@@ -507,4 +536,3 @@ function findSymbolByNameInFile(name, file, symbols) {
     }
     return undefined;
 }
-//# sourceMappingURL=scanner.js.map

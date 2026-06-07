@@ -491,4 +491,3 @@ export function truncateOutput(lines, maxTokens) {
     }
     return kept.join("\n");
 }
-//# sourceMappingURL=output.js.map

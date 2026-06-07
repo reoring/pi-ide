@@ -6,12 +6,12 @@ export function registerSafeDelete(pi) {
         name: "code_safe_delete",
         label: "Safe Delete",
         description: `\
-		Required safety gate before removing any symbol. Automatically
-		verifies zero incoming references before providing deletion
-		instructions. This is a WRITE operation. Safety workflow: checks
-		incoming references (must be 0), reports outgoing references,
-		provides deletion guidance. Do not delete based on intuition — a
-		symbol that looks unused may be called dynamically.`,
+			Required safety gate before removing any symbol. Automatically
+			verifies zero incoming references before providing deletion
+			instructions. This is a read-only check. Safety workflow: checks
+			incoming references (must be 0), reports outgoing references,
+			provides deletion guidance. Do not delete based on intuition — a
+			symbol that looks unused may be called dynamically.`,
         params: Type.Object({
             symbol: Type.String(),
             dryRun: Type.Optional(Type.Boolean()),
@@ -100,4 +100,3 @@ function formatSafeDeleteResult(result, symbolName) {
     }
     return lines.join("\n");
 }
-//# sourceMappingURL=safe_delete.js.map

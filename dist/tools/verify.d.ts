@@ -23,6 +23,8 @@ export interface VerifyOptions {
     noCascade?: boolean;
     noSecrets?: boolean;
 }
+export declare function executeVerifyJsonAsync(projectRoot: string, options: VerifyOptions): Promise<Record<string, unknown>>;
+export declare function executeVerifyTextAsync(projectRoot: string, options: VerifyOptions): Promise<string>;
 /**
  * Synchronous verify (no LSP, graph-only).
  */
@@ -35,4 +37,3 @@ export declare function executeCheck(graph: RepoGraph, _projectRoot: string, fil
 export declare function executeCheckJson(graph: RepoGraph, _projectRoot: string, file?: string): string;
 export declare function executeReady(graph: RepoGraph, projectRoot: string): string;
 export declare function executeReadyJson(graph: RepoGraph, projectRoot: string): string;
-//# sourceMappingURL=verify.d.ts.map

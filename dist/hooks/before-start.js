@@ -105,4 +105,3 @@ export function registerBeforeStartHook(pi) {
         }
     });
 }
-//# sourceMappingURL=before-start.js.map

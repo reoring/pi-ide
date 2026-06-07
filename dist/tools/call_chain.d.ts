@@ -16,4 +16,3 @@ interface FlatReference {
 export declare function getFlatReferences(graph: RepoGraph, symbolName: string): FlatReference[];
 export declare function formatFlatReferences(refs: FlatReference[], symbolName: string): string;
 export {};
-//# sourceMappingURL=call_chain.d.ts.map

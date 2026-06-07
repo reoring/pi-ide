@@ -219,4 +219,3 @@ export const QUERIES = {
 };
 // TSX uses the same queries as typescript
 QUERIES["tsx"] = QUERIES["typescript"];
-//# sourceMappingURL=treesitter-queries.js.map

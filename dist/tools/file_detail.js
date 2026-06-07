@@ -160,4 +160,3 @@ export function executeFileDetailJson(graph, file) {
         },
     });
 }
-//# sourceMappingURL=file_detail.js.map

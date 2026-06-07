@@ -64,4 +64,3 @@ export declare class TreeSitterAdapter {
     private _signature;
 }
 export {};
-//# sourceMappingURL=treesitter.d.ts.map

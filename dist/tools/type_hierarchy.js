@@ -161,4 +161,3 @@ function formatTypeHierarchy(result, name) {
     }
     return lines.join("\n");
 }
-//# sourceMappingURL=type_hierarchy.js.map

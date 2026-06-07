@@ -126,4 +126,3 @@ export function getInstallInstructions() {
     }
     return map;
 }
-//# sourceMappingURL=setup.js.map

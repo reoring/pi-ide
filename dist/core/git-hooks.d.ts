@@ -43,4 +43,3 @@ export declare function runPreCommitVerify(projectRoot: string): {
     verdict: "PASS" | "FAIL" | "WARN";
     message: string;
 };
-//# sourceMappingURL=git-hooks.d.ts.map

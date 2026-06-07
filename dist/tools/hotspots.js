@@ -96,4 +96,3 @@ function computeHotspots(graph, topN) {
     }
     return [...fileStats.values()].sort((a, b) => b.hotspotScore - a.hotspotScore).slice(0, topN);
 }
-//# sourceMappingURL=hotspots.js.map

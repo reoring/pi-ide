@@ -113,7 +113,7 @@ export function serializeGraphV2(graph, fileMtimes) {
     for (const [k, v] of fileMtimes)
         fileMtimesObj[k] = v;
     return {
-        version: 2,
+        version: 3,
         timestamp: Date.now(),
         symbols,
         edges,
@@ -295,4 +295,3 @@ export function compareGraphSnapshots(currentSymbols, currentEdges, previousSymb
         },
     };
 }
-//# sourceMappingURL=graph.js.map

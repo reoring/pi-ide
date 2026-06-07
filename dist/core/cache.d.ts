@@ -4,8 +4,8 @@
  * Ported from repomap/src/__init__.py (get_project_cache_dir, compare_graph_snapshots,
  * IncrementalCache).
  *
- * Uses Node.js fs + path for file I/O, matching repomap's convention of
- * storing cache under ~/.cache/repomap/<project-slug>.
+ * Uses Node.js fs + path for file I/O, storing cache under
+ * ~/.cache/pi-ide/<project-slug>.
  */
 import { serializeGraph, serializeSymbol, serializeEdge, compareGraphSnapshots } from "./graph.js";
 import type { RepoGraph, SerializedGraph, GraphDiff } from "./graph.js";
@@ -61,4 +61,3 @@ export declare function loadGraphCache(cachePath: string): GraphCacheData | null
  * Re-export serialization helpers for convenience.
  */
 export { serializeGraph, serializeSymbol, serializeEdge, compareGraphSnapshots };
-//# sourceMappingURL=cache.d.ts.map

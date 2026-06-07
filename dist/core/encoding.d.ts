@@ -22,4 +22,3 @@ export declare function detectEncoding(buffer: Buffer): string;
  * Read a file with specific encoding.
  */
 export declare function readFileWithEncoding(filePath: string, encoding: string): string;
-//# sourceMappingURL=encoding.d.ts.map

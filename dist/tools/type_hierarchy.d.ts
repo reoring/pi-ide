@@ -24,4 +24,3 @@ interface TypeHierarchyResult {
 }
 export declare function executeTypeHierarchy(graph: RepoGraph, name: string, direction?: "both" | "supertypes" | "subtypes"): TypeHierarchyResult;
 export {};
-//# sourceMappingURL=type_hierarchy.d.ts.map

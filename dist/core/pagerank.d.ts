@@ -16,4 +16,3 @@ import type { RepoGraph } from "./graph.js";
  * Convergence tolerance: 1e-6
  */
 export declare function calculatePageRank(graph: RepoGraph, damping?: number, maxIter?: number, tol?: number): void;
-//# sourceMappingURL=pagerank.d.ts.map

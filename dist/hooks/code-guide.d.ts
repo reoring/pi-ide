@@ -10,4 +10,3 @@
  */
 import type { ExtensionAPI } from "../types/pi-extension.js";
 export declare function registerCodeGuide(pi: ExtensionAPI): void;
-//# sourceMappingURL=code-guide.d.ts.map

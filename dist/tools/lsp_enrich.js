@@ -222,4 +222,3 @@ export async function lspFoldingRanges(ctx, filePath, timeoutMs = DEFAULT_LSP_EN
     }
     return withEnrichTimeout(opened.client.foldingRange(filePath), timeoutMs);
 }
-//# sourceMappingURL=lsp_enrich.js.map

@@ -4,8 +4,8 @@
  * Ported from repomap/src/__init__.py (get_project_cache_dir, compare_graph_snapshots,
  * IncrementalCache).
  *
- * Uses Node.js fs + path for file I/O, matching repomap's convention of
- * storing cache under ~/.cache/repomap/<project-slug>.
+ * Uses Node.js fs + path for file I/O, storing cache under
+ * ~/.cache/pi-ide/<project-slug>.
  */
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
@@ -13,7 +13,7 @@ import { homedir } from "node:os";
 import { createHash } from "node:crypto";
 import { serializeGraph, serializeSymbol, serializeEdge, serializeGraphV2, deserializeGraphV2, compareGraphSnapshots, } from "./graph.js";
 // ── Cache directory management ───────────────────────────────────────────────
-const CACHE_ROOT = join(homedir(), ".cache", "repomap");
+const CACHE_ROOT = join(homedir(), ".cache", "pi-ide");
 /**
  * Get the cache directory for a specific project.
  * Uses MD5 hash of canonical path for isolation.
@@ -125,7 +125,9 @@ export function saveGraphCache(graph, fileMtimes, cachePath) {
 }
 /**
  * Load a persistent graph cache. Returns null if missing, corrupt, wrong
- * version, or older than 7 days.
+ * version, or older than 7 days. Version 3 intentionally invalidates the
+ * earlier repomap/pi-shazam cache shape, which could contain complete mtimes
+ * but an incomplete graph.
  */
 export function loadGraphCache(cachePath) {
     if (!existsSync(cachePath))
@@ -133,7 +135,7 @@ export function loadGraphCache(cachePath) {
     try {
         const raw = readFileSync(cachePath, "utf-8");
         const data = JSON.parse(raw);
-        if (!data || data.version !== 2 || !Array.isArray(data.symbols) || !Array.isArray(data.edges))
+        if (!data || data.version !== 3 || !Array.isArray(data.symbols) || !Array.isArray(data.edges))
             return null;
         if (Date.now() - data.timestamp > CACHE_MAX_AGE_MS)
             return null;
@@ -152,4 +154,3 @@ export function loadGraphCache(cachePath) {
  * Re-export serialization helpers for convenience.
  */
 export { serializeGraph, serializeSymbol, serializeEdge, compareGraphSnapshots };
-//# sourceMappingURL=cache.js.map

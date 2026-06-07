@@ -11,4 +11,3 @@ interface ImpactOptions {
 export declare function executeImpact(graph: RepoGraph, files: string[], opts?: ImpactOptions): string;
 export declare function executeImpactJson(graph: RepoGraph, files: string[]): string;
 export {};
-//# sourceMappingURL=impact.d.ts.map

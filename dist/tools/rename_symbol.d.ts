@@ -1,7 +1,7 @@
 /**
  * code tools/rename_symbol — LSP cross-file symbol rename.
  *
- * Uses LSP textDocument/rename to perform a cross-file rename.
+ * Estimates cross-file rename impact before the rename is applied elsewhere.
  * Requires prior call_chain verification for safety.
  * This is a write operation with side effects.
  */
@@ -18,4 +18,3 @@ interface RenameResult {
 }
 export declare function executeRenameSymbol(graph: RepoGraph, symbolName: string, newName: string): RenameResult;
 export {};
-//# sourceMappingURL=rename_symbol.d.ts.map

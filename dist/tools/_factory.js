@@ -68,4 +68,3 @@ export function createTool(pi, spec) {
         },
     });
 }
-//# sourceMappingURL=_factory.js.map

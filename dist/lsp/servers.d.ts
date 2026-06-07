@@ -40,4 +40,3 @@ export declare const DEFAULT_LSP_TIMEOUT_MS = 8000;
  * Get the recommended LSP timeout for a language (in milliseconds).
  */
 export declare function lspTimeoutFor(language: string): number;
-//# sourceMappingURL=servers.d.ts.map

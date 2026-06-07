@@ -12,7 +12,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { Type } from "typebox";
 import { scanProject } from "../core/scanner.js";
-import { isNonSourceFile } from "../core/filter.js";
+import { SKIP_DIRS, isNonSourceFile } from "../core/filter.js";
 import { getNextForTool, formatNextSection, truncateOutput } from "../core/output.js";
 import { getLspManager } from "./_context.js";
 import { lspWorkspaceSearch } from "./lsp_enrich.js";
@@ -38,13 +38,12 @@ export function registerCodesearch(pi) {
             const json = params.json ?? false;
             const target = params.target ?? "symbol";
             const maxTokens = params.maxTokens;
-            const graph = scanProject(".");
             if (target === "code") {
                 const result = executeFulltextSearch(params.query, params.topN);
                 let text = json
                     ? JSON.stringify({
                         schema_version: "1.0",
-                        command: "codesearch",
+                        command: "code_search",
                         status: "ok",
                         result: { query: params.query, target: "code", results: result.length },
                     })
@@ -61,6 +60,7 @@ export function registerCodesearch(pi) {
                     ],
                 };
             }
+            const graph = scanProject(".");
             // BM25 + LSP workspace/symbol in parallel
             const bm25Results = executeCodesearch(graph, params.query, params.topN);
             const lspManager = getLspManager();
@@ -70,7 +70,7 @@ export function registerCodesearch(pi) {
             let text = json
                 ? JSON.stringify({
                     schema_version: "1.0",
-                    command: "codesearch",
+                    command: "code_search",
                     status: "ok",
                     result: {
                         query: params.query,
@@ -231,14 +231,14 @@ function formatCodesearchResult(results, query, source) {
     }
     return lines.join("\n");
 }
-function executeFulltextSearch(query, topN) {
+export function executeFulltextSearch(query, topN) {
     const limit = topN ?? 20;
     // Try ripgrep first (fastest, respects .gitignore)
     if (existsSync("/usr/bin/rg") ||
         existsSync("/usr/local/bin/rg") ||
         execSync("which rg 2>/dev/null || true").toString().trim()) {
         try {
-            const output = execSync(`rg --no-heading -n --max-count 20 --context 1 -i -g '!.git' -g '!node_modules' -g '!dist' -g '!*.lock' -g '!package-lock.json' -g '!yarn.lock' -g '!pnpm-lock.yaml' ${JSON.stringify(query)} 2>/dev/null | head -${limit * 3}`, { encoding: "utf-8", timeout: 5000 });
+            const output = execSync(`rg --no-heading -n --max-count 20 --context 1 -i -g '!.git' -g '!node_modules' -g '!dist' -g '!build' -g '!.tmp/**' -g '!_agents/**' -g '!*.lock' -g '!package-lock.json' -g '!yarn.lock' -g '!pnpm-lock.yaml' -- ${JSON.stringify(query)} . 2>/dev/null | head -${limit * 3}`, { encoding: "utf-8", timeout: 5000 });
             return parseRipgrepOutput(output, query, limit);
         }
         catch {
@@ -260,7 +260,7 @@ function parseRipgrepOutput(output, query, limit) {
         const match = line.match(/^([^:]+):(\d+):(.+)/);
         if (match) {
             results.push({
-                file: match[1],
+                file: match[1].replace(/^\.\//, ""),
                 line: parseInt(match[2], 10),
                 column: match[3].search(new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i")) + 1 || 1,
                 text: match[3].trim(),
@@ -274,7 +274,7 @@ function builtinFulltextSearch(query, limit) {
     const lower = query.toLowerCase();
     const projectRoot = process.cwd();
     // Directories to skip
-    const skipDirs = new Set([".git", "node_modules", "dist", "build", ".next", ".cache", "target", "__pycache__"]);
+    const skipDirs = new Set([".git", "node_modules", "dist", "build", ".next", ".cache", "target", "__pycache__", ...SKIP_DIRS]);
     const skipFiles = ["package-lock.json", "pnpm-lock.yaml", "yarn.lock", ".min.js", ".min.css"];
     function scanDir(dir) {
         if (results.length >= limit)
@@ -365,7 +365,7 @@ function builtinFulltextSearch(query, limit) {
     scanDir(projectRoot);
     return results;
 }
-function formatFulltextResult(results, query) {
+export function formatFulltextResult(results, query) {
     if (results.length === 0) {
         return `No results found for query: "${query}"`;
     }
@@ -382,4 +382,3 @@ function formatFulltextResult(results, query) {
     }
     return lines.join("\n");
 }
-//# sourceMappingURL=codesearch.js.map

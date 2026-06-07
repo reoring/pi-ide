@@ -115,4 +115,3 @@ export function registerAfterWriteHook(pi) {
         }
     });
 }
-//# sourceMappingURL=after-write.js.map

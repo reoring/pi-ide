@@ -123,4 +123,3 @@ export const DEFAULT_LSP_TIMEOUT_MS = 8_000;
 export function lspTimeoutFor(language) {
     return LSP_TIMEOUT_BY_LANGUAGE[language] ?? DEFAULT_LSP_TIMEOUT_MS;
 }
-//# sourceMappingURL=servers.js.map
